@@ -8,7 +8,8 @@
 <body>
 <textarea id="chat-log" cols="100" rows="20"></textarea><br/>
 <input id="chat-message-input" type="text" size="100"/><br/>
-<input id="chat-message-submit" type="button" value="Send"/>
+<input id="chat-message-submit" type="button" value="chat"/>
+<input id="notification-message-submit" type="button" value="notification"/>
 </body>
 <script>
     var roomName = {{ room_name_json }};
@@ -18,8 +19,11 @@
         '/ws/chat/' + roomName + '/');
 
     chatSocket.onmessage = function (e) {
+        console.log("oononononono");
         var data = JSON.parse(e.data);
         var message = data['message'];
+        var type = data['cate'];
+        console.log(type)
         document.querySelector('#chat-log').value += (message + '\n');
     };
 
@@ -34,11 +38,22 @@
         }
     };
 
+    document.querySelector('#notification-message-submit').onclick = function (e) {
+        var messageInputDom = document.querySelector('#chat-message-input');
+        var message = messageInputDom.value;
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'type':'notification'
+        }));
+
+        messageInputDom.value = '';
+    };
     document.querySelector('#chat-message-submit').onclick = function (e) {
         var messageInputDom = document.querySelector('#chat-message-input');
         var message = messageInputDom.value;
         chatSocket.send(JSON.stringify({
-            'message': message
+            'message': message,
+            'type':'chat'
         }));
 
         messageInputDom.value = '';
