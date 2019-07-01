@@ -29,6 +29,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -36,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'channels'
+
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -50,12 +52,12 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'facebock.urls'
-ASGI_APPLICATION = "chat.routing.application"
+ASGI_APPLICATION = 'facebock.routing.application'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'template')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
