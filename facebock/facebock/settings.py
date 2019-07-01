@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -48,6 +50,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'facebock.urls'
+ASGI_APPLICATION = "chat.routing.application"
 
 TEMPLATES = [
     {
