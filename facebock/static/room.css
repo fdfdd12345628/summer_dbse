@@ -249,3 +249,11 @@
     top: -8px;
     right: 8px;
 }
+#notification_list_group{
+    position:absolute;
+    top: 7vh;
+    right: 2vh;
+    width:20vw;
+    display:none;
+}
+
