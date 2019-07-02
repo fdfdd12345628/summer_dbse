@@ -5,6 +5,7 @@ import json
 
 
 def index(request):
+
     return render(request, 'chat/index.html', {})
 
 

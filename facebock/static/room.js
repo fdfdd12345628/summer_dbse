@@ -23,3 +23,9 @@ function seen_notification(id){
     $("#"+id).css("display","none");
     $("#"+id).text("0");
 }
+$(function(){
+    $("#notification_icon").on("click",function(){
+        console.log("click");
+        seen_notification("notification_redpoint");
+    });
+});

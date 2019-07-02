@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8"/>
     <title>Chat Room</title>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 	{% load static %}
@@ -16,7 +16,8 @@
 			<div class="row justify-content-center h-100">
 				<div class="col-md-4 col-xl-3 chat">
 					<textarea id="chat-log" cols="23" rows="20"></textarea><br/>
-					<input id="chat-message-input" type="text" size="20"/><br/>
+					<input id="chat-message-input" type="text" size="20" placeholder="chat_message"/><br/>
+					<input id="user-input" type="text" size="20" placeholder="user_name"/><br/>
 					<input id="chat-message-submit" type="button" value="chat"/>
 					<input id="notification-message-submit" type="button" value="notification"/>
 				</div>
@@ -238,17 +239,16 @@
 </body>
 <script>
     var roomName = {{ room_name_json }};
-
     var chatSocket = new WebSocket(
         'ws://' + window.location.host +
         '/ws/chat/' + roomName + '/');
 
     chatSocket.onmessage = function (e) {
-        console.log("oononononono");
         var data = JSON.parse(e.data);
         var message = data['message'];
         var type = data['cate'];
         console.log(type)
+        if(type == "notification"){add_red_point("notification_redpoint");}
         document.querySelector('#chat-log').value += (message + '\n');
     };
 
@@ -266,9 +266,11 @@
     document.querySelector('#notification-message-submit').onclick = function (e) {
         var messageInputDom = document.querySelector('#chat-message-input');
         var message = messageInputDom.value;
+        var user_name = document.querySelector('#user-input').value;
         chatSocket.send(JSON.stringify({
             'message': message,
-            'type':'notification'
+            'type':'notification',
+			'user_name':user_name,
         }));
 
         messageInputDom.value = '';
@@ -278,10 +280,12 @@
         var message = messageInputDom.value;
         chatSocket.send(JSON.stringify({
             'message': message,
-            'type':'chat'
+            'type':'chat',
+            'user_name':"x",
         }));
 
         messageInputDom.value = '';
     };
+
 </script>
 </html>
