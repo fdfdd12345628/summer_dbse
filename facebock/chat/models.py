@@ -22,4 +22,4 @@ class Message(models.Model):
     content = models.CharField(max_length=1000)
     date = models.DateTimeField()
     to_group = models.ForeignKey(Group, on_delete=None, related_name='to_group')
-    seen = models.ManyToManyField(User, related_name='seen')
+    seen = models.ManyToManyField(User, related_name='seen', null=True)
