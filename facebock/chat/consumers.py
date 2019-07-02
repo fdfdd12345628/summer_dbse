@@ -11,13 +11,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
-        self.user=self.scope['user']
-        print(self.channel_name)
-        print(self.scope['user'].is_anonymous)
+        if self.scope["user"].is_anonymous:
+            self.user_name="anonymous"
+        else:
+            self.user_name = self.scope["user"].username
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
-            self.channel_name
+            self.channel_name,
+        )
+        async_to_sync(self.channel_layer.group_add)(
+            self.user_name,
+            self.channel_name,
         )
 
         await self.accept()
@@ -26,7 +31,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Leave room group
         await self.channel_layer.group_discard(
             self.room_group_name,
-            self.channel_name
+            self.channel_name,
+            self.user_name,
         )
 
     # Receive message from WebSocket
@@ -34,11 +40,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
         cate = text_data_json['type']
+        user_name = text_data_json['user_name']
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chat_message',
+                'message': message,
+                'cate':cate,
+            }
+        )
+        async_to_sync(self.channel_layer.group_send)(
+            user_name,
+            {
+                'type': 'notification_message',
                 'message': message,
                 'cate':cate,
             }
@@ -49,10 +64,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = event['message']
         cate = event['cate']
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({
-            'message': message,
-            'cate':cate,
-        }))
+        if cate == "chat":
+            self.send(text_data=json.dumps({
+                'message': message,
+                'cate':cate,
+            }))
+
+    def notification_message(self, event):
+        message = event['message']
+        cate = event['cate']
+        # Send message to WebSocket
+        if cate == "notification":
+            self.send(text_data=json.dumps({
+                'message': message,
+                'cate':cate,
+            }))
 
     @database_sync_to_async
     def get_notification(self):
