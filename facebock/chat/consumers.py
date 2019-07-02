@@ -4,8 +4,10 @@ import json
 from channels.db import database_sync_to_async
 from django.contrib import auth
 from django.contrib.auth.models import User
-from .models import Notification, Group, Message
+from .models import Notification, Group, Message, Clients
 import datetime
+import channels
+from channels.layers import get_channel_layer
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -17,7 +19,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         else:
             self.user_name = self.scope["user"].username
             self.user = self.scope['user']
-            print(self.user)
+            print(self.user.username)
+            await self.add_clients()
+        print(await self.get_all_user_layer(group_name=1))
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -49,14 +53,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user_name = text_data_json['user_name']
         # Send message to room group
         if cate == 'chat':
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    'type': 'chat_message',
-                    'message': message,
-                    'cate': cate,
-                }
+            groupname = '1'  # text_data_json['groupname']
+            await self.channel_layer.group_add(
+                groupname,
+                self.channel_name
             )
+            total_channel = await self.get_all_user_layer(group_name=groupname)
+            for channel in total_channel:
+                await self.channel_layer.send(
+                    channel,
+                    {
+                        'type': 'chat_message',
+                        'message': message,
+                        'cate': cate,
+                        'user': User.objects.all(),
+                        'group_name': groupname,
+                        'from_user': self.user
+                    }
+                )
         elif cate == 'notification':
             await self.channel_layer.group_send(
                 user_name,
@@ -71,12 +85,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         message = event['message']
         cate = event['cate']
+        if self.user in event['user']:
+            pass
+        now = datetime.datetime.now()
         # Send message to WebSocket
-
         await self.send(text_data=json.dumps({
+            'type': 'chat',
+            'group_name': event['group_name'],
             'message': message,
-            'cate': cate,
+            'from_user': event['from_user'],
+            'date': now
         }))
+        await self.put_message(
+            group=event['group_name'],
+            from_user=event['from_user'],
+        )
         '''await self.put_message(text=message,
                                group=)
         '''
@@ -93,17 +116,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.put_notification(text=message,
                                         to_user=self.user)
 
-
     @database_sync_to_async
     def get_notification(self, notification_id):
         return Notification.objects.get(pk=notification_id)
         pass
 
-
     @database_sync_to_async
     def get_user(self, user_id):
         return User.objects.get(pk=user_id)
-
 
     @database_sync_to_async
     def put_notification(self, text, to_user):
@@ -114,16 +134,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                     seen=False,
                                     )
         notification.save()
-        pass
+
 
     @database_sync_to_async
     def get_message(self):
         pass
 
     @database_sync_to_async
-    def put_message(self, text, group=None):
+    def put_message(self, text, group, from_user):
         if group is not None:
-            message = Message(from_user=self.user,
+            message = Message(from_user=from_user,
                               content=text,
                               date=datetime.datetime.now(),
                               to_group=group, )
@@ -133,16 +153,29 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
 
     @database_sync_to_async
-    def create_group(self, user_1, user_2=None):
+    def create_group(self, user_1, *args: User):
         group = Group()
         group.user.add(user_1)
-        group.user.add(user_2)
-        pass
+        for user in args:
+            group.user.add(user)
 
     @database_sync_to_async
     def group_add_user(self, group, user):
         group.user.add(user)
         group.save()
 
-    def get_group(self, group_id, ):
-        pass
+    @database_sync_to_async
+    def add_clients(self):
+        obj, created = Clients.objects.get_or_create(
+            user=self.user,
+            layer=self.channel_name)
+
+    @database_sync_to_async
+    def delete_client(self):
+        Clients.objects.filter(user=self.user).delete()
+
+    @database_sync_to_async
+    def get_all_user_layer(self, group_name):
+        group = Group.objects.get(pk=group_name)
+        all_layer = Clients.objects.filter(user__in=[each for each in group.user.all()])
+        return [layer.layer for layer in all_layer]

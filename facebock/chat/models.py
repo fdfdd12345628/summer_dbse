@@ -22,4 +22,9 @@ class Message(models.Model):
     content = models.CharField(max_length=1000)
     date = models.DateTimeField()
     to_group = models.ForeignKey(Group, on_delete=None, related_name='message_to_group')
-    seen = models.ManyToManyField(User, related_name='message_seen', null=True)
+    seen = models.ManyToManyField(User, related_name='message_seen')
+
+
+class Clients(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    layer = models.CharField(max_length=100)
