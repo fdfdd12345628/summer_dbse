@@ -50,10 +50,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
         cate = text_data_json['type']
-        user_name = text_data_json['user_name']
         # Send message to room group
         if cate == 'chat':
-            groupname = '1'  # text_data_json['groupname']
+            #groupname = '1'  # text_data_json['groupname']
+            groupname = text_data_json['groupname']
             await self.channel_layer.group_add(
                 groupname,
                 self.channel_name
@@ -72,6 +72,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     }
                 )
         elif cate == 'notification':
+            user_name = text_data_json['user_name']
             await self.channel_layer.group_send(
                 user_name,
                 {

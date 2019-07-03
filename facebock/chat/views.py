@@ -24,7 +24,6 @@ def room(request, room_name):
             All_Notification = []
             All_User = []
             All_Involved_Group = []
-        print(All_Involved_Group)
         return render(request, 'chat/room.html', {
             'room_name_json': mark_safe(json.dumps(room_name)),
             'All_Notification': All_Notification,
@@ -42,10 +41,20 @@ def room(request, room_name):
             return HttpResponse(status=200)
         elif request.POST.get("type","") == "Create_Group_Single":
             to_user = request.POST.get("user","")
-            Create_Group = Group.objects.create(display_name=request.user.username+"_with_"+User.objects.get(id = to_user).username)
-            Create_Group.save()
-            Create_Group.user.add(request.user)
-            Create_Group.user.add(User.objects.get(id = to_user))
-            print(Create_Group)
-            return HttpResponse(Create_Group.id)
+            content = {}
+            Redundant_Group = Group.objects.filter(type="single", user__in = [request.user.id]).filter(user__in = [to_user])
+            print(Redundant_Group)
+            if Redundant_Group.count() == 0:
+                Create_Group = Group.objects.create(display_name=request.user.username+"_with_"+User.objects.get(id = to_user).username , type="single")
+                Create_Group.save()
+                Create_Group.user.add(request.user)
+                Create_Group.user.add(User.objects.get(id = to_user))
+                print(Create_Group)
+                content["id"] = Create_Group.id
+                content["display_name"] = Create_Group.display_name
+                return HttpResponse(json.dumps(content))
+            else:
+                content["id"] = Redundant_Group.first().id
+                content["display_name"] = Redundant_Group.first().display_name
+                return  HttpResponse(json.dumps(content))
 # Create your views here.

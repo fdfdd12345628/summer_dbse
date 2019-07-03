@@ -75,7 +75,7 @@ $(function(){
 });
 $(function(){
     $(".other_user").click(function(){
-        console.log(this.id)
+        console.log(this.id.split("user_")[1])
         $.ajax({
        		type: 'POST',
        		url: '',
@@ -87,12 +87,34 @@ $(function(){
        		dataType: 'json',
        		success: function(content){
 				console.log("success");
-                $("#ChatRoom_Position").append('<div class="col-md-6 col-xl-6 chat" id="display_'+content+'"><div class="card"><div class="card-header msg_head"><div class="d-flex bd-highlight"><div class="img_cont"><img src="https://image.flaticon.com/icons/svg/784/784662.svg" class="rounded-circle user_img"><span class="online_icon"></span></div><div class="user_info"><span>'+content+'</span></div></div></div><div class="card-body msg_card_body"></div></div></div>')
+				console.log(content["id"])
+                if($("#display_room_" + content["id"] ).length == 0) {
+                    $("#ChatRoom_Position").append('<div class="col-md-6 col-xl-6 chat" id="display_room_'+content["id"]+'"><div class="card"><div class="card-header msg_head"><div class="d-flex bd-highlight"><div class="img_cont"><img src="https://image.flaticon.com/icons/svg/784/784662.svg" class="rounded-circle user_img"><span class="online_icon"></span></div><div class="user_info"><span>'+content["display_name"]+'</span></div></div></div><div class="card-body msg_card_body"></div><div class="card-footer"><div class="input-group"><div class="input-group-append"><span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span></div><textarea name="" class="form-control type_msg" placeholder="Type your message..."></textarea><div class="input-group-append"><span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span></div></div></div></div></div>')
+                }
        		},
         })
     })
     $(".exist_room").click(function(){
         console.log(this.id)
-        $("#ChatRoom_Position").append('<div class="col-md-6 col-xl-6 chat" id="display_'+this.id+'"><div class="card"><div class="card-header msg_head"><div class="d-flex bd-highlight"><div class="img_cont"><img src="https://image.flaticon.com/icons/svg/784/784662.svg" class="rounded-circle user_img"><span class="online_icon"></span></div><div class="user_info"><span>'+this.id+'</span></div></div></div><div class="card-body msg_card_body"></div></div></div>')
+        if($("#display_" + this.id ).length == 0) {
+            $("#ChatRoom_Position").append('<div class="col-md-6 col-xl-6 chat" id="display_'+this.id+'"><div class="card"><div class="card-header msg_head"><div class="d-flex bd-highlight"><div class="img_cont"><img src="https://image.flaticon.com/icons/svg/784/784662.svg" class="rounded-circle user_img"><span class="online_icon"></span></div><div class="user_info"><span>'+$("#"+this.id).find(".user_info > span").text()+'</span></div></div></div><div class="card-body msg_card_body"></div><div class="card-footer"><div class="input-group"><div class="input-group-append"><span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span></div><textarea name="" class="form-control type_msg" placeholder="Type your message..."></textarea><div class="input-group-append"><span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span></div></div></div></div></div>')
+        }
     })
+
+
+    $(document).on("keypress",".type_msg",function (e) {
+        if(e.which == 13) {
+            console.log($(this))
+            //submit form via ajax, this is not JS but server side scripting so not showing here
+            $(this).parent().parent().parent().find(".msg_card_body").append($(this).val() + "<br/>");
+            chatSocket.send(JSON.stringify({
+                'message': $(this).val(),
+                'type':'chat',
+                'groupname': $(this).parent().parent().parent().parent().attr("id").split("display_room_")[1],
+            }));
+            var $this = $(this)
+            setTimeout(function(){ $this.val("") }, 3);
+        }
+    });
 })
+

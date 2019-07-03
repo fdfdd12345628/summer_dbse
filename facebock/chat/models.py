@@ -8,6 +8,7 @@ import datetime
 class Group(models.Model):
     user = models.ManyToManyField(User)
     display_name = models.CharField(max_length=100)
+    type = models.CharField(max_length=20)
 
 
 class Notification(models.Model):
