@@ -16,9 +16,14 @@ def room(request, room_name):
         if request.user.is_authenticated:
             userid = request.user.id
         owner = request.user
-        All_Notification = Notification.objects.filter(to_user_id=owner)
-        All_User = User.objects.exclude(id = userid)
-        All_Involved_Group = Group.objects.filter(user__in=[userid])
+        if request.user.is_authenticated:
+            All_Notification = Notification.objects.filter(to_user_id=owner)
+            All_User = User.objects.exclude(id=userid)
+            All_Involved_Group = Group.objects.filter(user__in=[userid])
+        else:
+            All_Notification = []
+            All_User = []
+            All_Involved_Group = []
         print(All_Involved_Group)
         return render(request, 'chat/room.html', {
             'room_name_json': mark_safe(json.dumps(room_name)),

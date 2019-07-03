@@ -21,13 +21,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.user = self.scope['user']
             print(self.user.username)
             await self.add_clients()
-        print(await self.get_all_user_layer(group_name=1))
+        # print(await self.get_all_user_layer(group_name=1))
         # Join room group
-        await (self.channel_layer.group_add)(
+        await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name,
         )
-        await (self.channel_layer.group_add)(
+        await self.channel_layer.group_add(
             self.user_name,
             self.channel_name,
         )
@@ -36,10 +36,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         # Leave room group
-        await (self.channel_layer.group_discard)(
+        await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name,
+        )
+        await self.channel_layer.group_discard(
             self.user_name,
+            self.channel_name,
         )
 
     # Receive message from WebSocket
@@ -90,12 +93,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'type': 'chat',
             'group_name': event['group_name'],
             'message': message,
-            'from_user': event['from_user'],
-            'date': now
+            'from_user': event['from_user'].username,
+            'date': now.__str__()
         }))
         await self.put_message(
             group=event['group_name'],
             from_user=event['from_user'],
+            text=message,
         )
         '''await self.put_message(text=message,
                                group=)
@@ -139,6 +143,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def put_message(self, text, group, from_user):
         if group is not None:
+            group = Group.objects.get(pk=group)
             message = Message(from_user=from_user,
                               content=text,
                               date=datetime.datetime.now(),

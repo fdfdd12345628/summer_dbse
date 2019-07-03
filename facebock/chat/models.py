@@ -9,6 +9,7 @@ class Group(models.Model):
     user = models.ManyToManyField(User)
     display_name = models.CharField(max_length=100)
 
+
 class Notification(models.Model):
     from_user = models.ForeignKey(User, on_delete=None, related_name='notification_from_user')
     to_user = models.ForeignKey(User, on_delete=None, related_name='notification_to_user')
