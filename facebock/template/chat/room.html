@@ -138,13 +138,16 @@
     chatSocket.onmessage = function (e) {
         var data = JSON.parse(e.data);
         var message = data['message'];
-        var type = data['cate'];
+        var type = data['type'];
         console.log(type)
         if(type == "notification"){
        		add_red_point("notification_redpoint");
-        	//var notification_id = data["id"]
-			$('<a href="#" class="list-group-item list-group-item-action list-group-item-primary"id="notification_1">'+message+'</a>').insertBefore($("#notification_list_group a:first-child"));
-			console.log($("#notification_list_group li:first-child").attr("id"))
+        	var notification_id = data["id"]
+        	console.log(notification_id)
+			$('<a href="#" class="list-group-item list-group-item-action list-group-item-primary"id="notification_'+notification_id+'">'+message+'</a>').insertBefore($("#notification_list_group a:first-child"));
+			console.log($("#notification_list_group a:first-child").attr("id"))
+        }else if(type == "chat"){
+
         }
         document.querySelector('#chat-log').value += (message + '\n');
     };
