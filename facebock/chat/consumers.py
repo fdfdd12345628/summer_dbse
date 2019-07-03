@@ -72,17 +72,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'from_user': self.user
                     }
                 )
+            await self.put_message(
+                group=groupname,
+                from_user=self.user,
+                text=message,
+            )
         elif cate == 'notification':
             user_name = text_data_json['user_name']
+            notification = await self.put_notification(text=message,
+                                                       from_user=self.user.username,
+                                                       to_user=user_name)
             await self.channel_layer.group_send(
                 user_name,
                 {
                     'type': 'notification_message',
                     'message': message,
                     'cate': cate,
-                    'from_user': self.user
+                    'from_user': self.user,
+                    'id': notification.id
                 }
             )
+
 
     # Receive message from room group
     async def chat_message(self, event):
@@ -101,11 +111,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'from_user': event['from_user'].username,
             'date': now.__str__()
         }))
-        await self.put_message(
-            group=event['group_name'],
-            from_user=event['from_user'],
-            text=message,
-        )
+
         '''await self.put_message(text=message,
                                group=)
         '''
@@ -116,14 +122,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         now = datetime.datetime.now()
         # Send message to WebSocket
         if cate == "notification":
-            notification = await self.put_notification(text=message,
-                                                       from_user=self.user)
+
             await self.send(text_data=json.dumps({
                 'type': 'notification',
                 'message': message,
                 'from_user': event['from_user'].username,
                 'date': str(now),
-                'id': notification.id,
+                'id': event['id'].id,
             }))
 
     @database_sync_to_async
@@ -136,9 +141,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return User.objects.get(pk=user_id)
 
     @database_sync_to_async
-    def put_notification(self, text, from_user):
-        notification = Notification(from_user=from_user,
-                                    to_user=self.user,
+    def put_notification(self, text, from_username, to_username):
+        notification = Notification(from_user=User.objects.get(username=from_username),
+                                    to_user=User.objects.get(username=to_username),
                                     content=text,
                                     date=datetime.datetime.now(),
                                     seen=False,
@@ -155,9 +160,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return Group.objects.get(pk=group_id)
 
     @database_sync_to_async
-    def put_message(self, text, group, from_user):
-        if group is not None:
-            group = Group.objects.get(pk=group)
+    def put_message(self, text, group_id, from_user):
+        if group_id is not None:
+            group = Group.objects.get(pk=group_id)
             message = Message(from_user=from_user,
                               content=text,
                               date=datetime.datetime.now(),
