@@ -92,9 +92,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             pass
         now = datetime.datetime.now()
         # Send message to WebSocket
+        group=await self.get_group(event['group_name'])
         await self.send(text_data=json.dumps({
             'type': 'chat',
             'group_name': event['group_name'],
+            'display_name':group.display_name,
             'message': message,
             'from_user': event['from_user'].username,
             'date': now.__str__()
@@ -147,6 +149,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_message(self):
         pass
+
+    @database_sync_to_async
+    def get_group(self, group_id):
+        return Group.objects.get(pk=group_id)
 
     @database_sync_to_async
     def put_message(self, text, group, from_user):
