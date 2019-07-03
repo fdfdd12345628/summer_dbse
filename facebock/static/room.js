@@ -2,7 +2,26 @@ $(document).ready(function(){
     $('#action_menu_btn').click(function(){
 	    $('.action_menu').toggle();
     });
+
 });
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+
 function change_to_none_notification(){
     // change notification icon
     $("#notification_icon").removeClass("Notification");
@@ -54,3 +73,26 @@ $(function(){
         }
     });
 });
+$(function(){
+    $(".other_user").click(function(){
+        console.log(this.id)
+        $.ajax({
+       		type: 'POST',
+       		url: '',
+       		data: {
+       			type: "Create_Group_Single",
+       			user : this.id.split("user_")[1],
+       			'csrfmiddlewaretoken': csrftoken,
+       		},
+       		dataType: 'json',
+       		success: function(content){
+				console.log("success");
+                $("#ChatRoom_Position").append('<div class="col-md-6 col-xl-6 chat" id="display_'+content+'"><div class="card"><div class="card-header msg_head"><div class="d-flex bd-highlight"><div class="img_cont"><img src="https://image.flaticon.com/icons/svg/784/784662.svg" class="rounded-circle user_img"><span class="online_icon"></span></div><div class="user_info"><span>'+content+'</span></div></div></div><div class="card-body msg_card_body"></div></div></div>')
+       		},
+        })
+    })
+    $(".exist_room").click(function(){
+        console.log(this.id)
+        $("#ChatRoom_Position").append('<div class="col-md-6 col-xl-6 chat" id="display_'+this.id+'"><div class="card"><div class="card-header msg_head"><div class="d-flex bd-highlight"><div class="img_cont"><img src="https://image.flaticon.com/icons/svg/784/784662.svg" class="rounded-circle user_img"><span class="online_icon"></span></div><div class="user_info"><span>'+this.id+'</span></div></div></div><div class="card-body msg_card_body"></div></div></div>')
+    })
+})
