@@ -44,6 +44,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.user_name,
             self.channel_name,
         )
+        await self.delete_client()
 
     # Receive message from WebSocket
     async def receive(self, text_data=None, bytes_data=None):
@@ -52,7 +53,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         cate = text_data_json['type']
         # Send message to room group
         if cate == 'chat':
-            #groupname = '1'  # text_data_json['groupname']
+            # groupname = '1'  # text_data_json['groupname']
             groupname = text_data_json['groupname']
             await self.channel_layer.group_add(
                 groupname,
@@ -79,6 +80,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'type': 'notification_message',
                     'message': message,
                     'cate': cate,
+                    'from_user': self.user
                 }
             )
 
@@ -109,14 +111,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def notification_message(self, event):
         message = event['message']
         cate = event['cate']
+        now = datetime.datetime.now()
         # Send message to WebSocket
         if cate == "notification":
+            notification = await self.put_notification(text=message,
+                                                       from_user=self.user)
             await self.send(text_data=json.dumps({
+                'type': 'notification',
                 'message': message,
-                'cate': cate,
+                'from_user': event['from_user'].username,
+                'date': str(now),
+                'id': notification.id,
             }))
-            await self.put_notification(text=message,
-                                        to_user=self.user)
 
     @database_sync_to_async
     def get_notification(self, notification_id):
@@ -128,14 +134,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return User.objects.get(pk=user_id)
 
     @database_sync_to_async
-    def put_notification(self, text, to_user):
-        notification = Notification(from_user=self.user,
-                                    to_user=to_user,
+    def put_notification(self, text, from_user):
+        notification = Notification(from_user=from_user,
+                                    to_user=self.user,
                                     content=text,
                                     date=datetime.datetime.now(),
                                     seen=False,
                                     )
         notification.save()
+        return notification
 
     @database_sync_to_async
     def get_message(self):
