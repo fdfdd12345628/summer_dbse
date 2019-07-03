@@ -139,15 +139,27 @@
         var data = JSON.parse(e.data);
         var message = data['message'];
         var type = data['type'];
-        console.log(type)
         if(type == "notification"){
        		add_red_point("notification_redpoint");
         	var notification_id = data["id"]
-        	console.log(notification_id)
-			$('<a href="#" class="list-group-item list-group-item-action list-group-item-primary"id="notification_'+notification_id+'">'+message+'</a>').insertBefore($("#notification_list_group a:first-child"));
-			console.log($("#notification_list_group a:first-child").attr("id"))
+        	if($("#notification_list_group > a").length){
+				$('<a href="#" class="list-group-item list-group-item-action list-group-item-primary"id="notification_'+notification_id+'">'+message+'</a>').insertBefore($("#notification_list_group a:first-child"));
+				console.log($("#notification_list_group a:first-child").attr("id"))
+			}else{
+				$("#notification_list_group").append('<a href="#" class="list-group-item list-group-item-action list-group-item-primary"id="notification_'+notification_id+'">'+message+'</a>')
+			}
         }else if(type == "chat"){
-
+        	if(data['from_user'] != "{{ request.user.username }}"){
+				var group_name = data["group_name"]
+				var display_name = data["display_name"]
+				console.log(group_name)
+				if($("#display_room_"+group_name).length){
+            			$("#display_room_"+group_name).find(".msg_card_body").append(data['from_user']+" : "+message + "<br/>");
+				}else{
+                   	 	$("#ChatRoom_Position").append('<div class="col-md-6 col-xl-6 chat" id="display_room_'+group_name+'"><div class="card"><div class="card-header msg_head"><div class="d-flex bd-highlight"><div class="img_cont"><img src="https://image.flaticon.com/icons/svg/784/784662.svg" class="rounded-circle user_img"><span class="online_icon"></span></div><div class="user_info"><span>'+display_name+'</span></div></div></div><div class="card-body msg_card_body"></div><div class="card-footer"><div class="input-group"><div class="input-group-append"><span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span></div><textarea name="" class="form-control type_msg" placeholder="Type your message..."></textarea><div class="input-group-append"><span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span></div></div></div></div></div>')
+            			$("#display_room_"+group_name).find(".msg_card_body").append(data['from_user']+" : "+message + "<br/>");
+				}
+			}
         }
         document.querySelector('#chat-log').value += (message + '\n');
     };
