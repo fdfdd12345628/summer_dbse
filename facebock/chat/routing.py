@@ -1,5 +1,5 @@
 from django.conf.urls import url
-
+from channels.staticfiles import *
 from . import consumers
 
 websocket_urlpatterns = [
