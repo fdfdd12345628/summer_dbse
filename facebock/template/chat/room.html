@@ -83,34 +83,6 @@
 		</div>
 		<div class="col-md-6 col-xl-6">
 			<div class="row" id="ChatRoom_Position">
-                <!--div class="col-md-6 col-xl-6 chat">
-					<div class="card">
-						<div class="card-header msg_head">
-							<div class="d-flex bd-highlight">
-								<div class="img_cont">
-									<img src="https://image.flaticon.com/icons/svg/784/784662.svg" class="rounded-circle user_img">
-									<span class="online_icon"></span>
-								</div>
-								<div class="user_info">
-									<span>ROOM NAME</span>
-								</div>
-							</div>
-						</div>
-						<div class="card-body msg_card_body">
-						</div>
-						<div class="card-footer">
-							<div class="input-group">
-								<div class="input-group-append">
-									<span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span>
-								</div>
-								<textarea name="" class="form-control type_msg" placeholder="Type your message..."></textarea>
-								<div class="input-group-append">
-									<span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div-->
 			</div>
 		</div>
 		<div id="notification_icon" class="None_Notification">
@@ -129,27 +101,49 @@
 </div>
 </body>
 <script>
-
+/******
+關於 ws的前端
+******/
     var roomName = {{ room_name_json }};
     var chatSocket = new WebSocket(
         'ws://' + window.location.host +
         '/ws/chat/' + roomName + '/');
 
+/******
+當訊息進入前端 進入 onmessage
+******/
     chatSocket.onmessage = function (e) {
         var data = JSON.parse(e.data);
         var message = data['message'];
         var type = data['type'];
-        console.log(type)
+        //判斷類別
         if(type == "notification"){
+       		//新增通知
        		add_red_point("notification_redpoint");
         	var notification_id = data["id"]
-        	console.log(notification_id)
-			$('<a href="#" class="list-group-item list-group-item-action list-group-item-primary"id="notification_'+notification_id+'">'+message+'</a>').insertBefore($("#notification_list_group a:first-child"));
-			console.log($("#notification_list_group a:first-child").attr("id"))
+        	//加入通知內容
+        	if($("#notification_list_group > a").length){
+				$('<a href="#" class="list-group-item list-group-item-action list-group-item-primary"id="notification_'+notification_id+'">'+message+'</a>').insertBefore($("#notification_list_group a:first-child"));
+				console.log($("#notification_list_group a:first-child").attr("id"))
+			}else{
+				$("#notification_list_group").append('<a href="#" class="list-group-item list-group-item-action list-group-item-primary"id="notification_'+notification_id+'">'+message+'</a>')
+			}
         }else if(type == "chat"){
-
+        	/******確認收到訊息者為接收者 非發送者******/
+        	if(data['from_user'] != "{{ request.user.username }}"){
+				var group_name = data["group_name"]
+				var display_name = data["display_name"]
+				console.log(group_name)
+				//若聊天室未打開 則append聊天室
+				if($("#display_room_"+group_name).length){
+            			$("#display_room_"+group_name).find(".msg_card_body").append(data['from_user']+" : "+message + "<br/>");
+				}else{
+                   	 	$("#ChatRoom_Position").append('<div class="col-md-6 col-xl-6 chat" id="display_room_'+group_name+'"><div class="card"><div class="card-header msg_head"><div class="d-flex bd-highlight"><div class="img_cont"><img src="https://image.flaticon.com/icons/svg/784/784662.svg" class="rounded-circle user_img"><span class="online_icon"></span></div><div class="user_info"><span>'+display_name+'</span></div></div></div><div class="card-body msg_card_body"></div><div class="card-footer"><div class="input-group"><div class="input-group-append"><span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span></div><textarea name="" class="form-control type_msg" placeholder="Type your message..."></textarea><div class="input-group-append"><span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span></div></div></div></div></div>')
+            			$("#display_room_"+group_name).find(".msg_card_body").append(data['from_user']+" : "+message + "<br/>");
+				}
+			}
         }
-        document.querySelector('#chat-log').value += (message + '\n');
+        //document.querySelector('#chat-log').value += (message + '\n');
     };
 
     chatSocket.onclose = function (e) {
@@ -157,11 +151,15 @@
     };
 
     document.querySelector('#chat-message-input').focus();
+    /********
+    initially existed, no use
     document.querySelector('#chat-message-input').onkeyup = function (e) {
         if (e.keyCode === 13) {  // enter, return
             document.querySelector('#chat-message-submit').click();
         }
     };
+	*********/
+
 
     document.querySelector('#notification-message-submit').onclick = function (e) {
         var messageInputDom = document.querySelector('#chat-message-input');
@@ -172,23 +170,22 @@
             'type':'notification',
 			'user_name':user_name,
         }));
-
         messageInputDom.value = '';
     };
-    document.querySelector('#chat-message-submit').onclick = function (e) {
-        var messageInputDom = document.querySelector('#chat-message-input');
-        var message = messageInputDom.value;
-        chatSocket.send(JSON.stringify({
-            'message': message,
-            'type':'chat',
-            'user_name':"x",
-        }));
-
-        messageInputDom.value = '';
-    };
-
+    /******
+    傳送通知
+    Usage:
+        message: 欲傳送訊息
+        type: 判斷ws是通知或是聊天訊息
+        user_name: 判斷ws傳送對象 ( "user" )
+        {因 通知對人 聊天對聊天室}
+    ******/
 </script>
 <script>
+/******
+前端load
+******/
+
 	$(document).ready(function(){
 		{% for ele in All_Notification reversed %}
 			{% if not ele.seen %}
@@ -196,25 +193,11 @@
 			{% endif %}
     	{% endfor %}
 	})
-	function clean_seen(){
-		var ids = $('.list-group-item-primary').map(function() {
-  			return $(this).attr('id').split("notification_")[1];
-		}).toArray();
-		console.log(ids);
-		$.ajax({
-       		type: 'POST',
-       		url: '',
-       		data: {
-       			type: "Clean_Seen",
-       			seen_id : ids,
-       			'csrfmiddlewaretoken': '{{ csrf_token }}',
-       		},
-       		dataType: 'json',
-       		success: function(content){
-				console.log("success");
-       		},
-    })
-    }
+	/******
+	將通知數顯示在小紅點
+	{通知內容在html裡加入}
+	******/
+
 
 </script>
 </html>
