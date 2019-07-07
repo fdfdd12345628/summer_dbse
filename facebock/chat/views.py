@@ -2,10 +2,15 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.utils.safestring import mark_safe
 from .models  import Notification,Message,Group
-import json
+import json,os,string,random,sys
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from django.http import JsonResponse
+import webauthn.webauthn as webauthn
 
-
+RP_ID = 'localhost'
+ORIGIN = 'http://localhost:8000'
+TRUST_ANCHOR_DIR = 'trusted_attestation_roots'
 def index(request):
 
     return render(request, 'chat/index.html', {})
@@ -57,7 +62,6 @@ def room(request, room_name):
                 Create_Group.save()
                 Create_Group.user.add(request.user)
                 Create_Group.user.add(User.objects.get(id = to_user))
-                print(Create_Group)
                 # Create field:
                 #   display_name: 顯示的name  目前預設username_with_username
                 #   type: "single"
@@ -70,3 +74,161 @@ def room(request, room_name):
                 content["display_name"] = Redundant_Group.first().display_name
                 return  HttpResponse(json.dumps(content))
 # Create your views here.
+
+
+def webauthn_begin_activate(request):
+    print("webauthn_begin_activate")
+    # username = request.POST.get('username')
+    global username
+    username = request.POST.get('register_username', '')
+    display_name = request.POST.get('register_display_username')
+    print(username)
+    rp_name = "localhost"
+    challenge = generate_challenge(32)
+    ukey = generate_ukey()
+    if 'register_ukey' in request.session:
+        del request.session['register_ukey']
+    if 'register_username' in request.session:
+        del request.session['register_username']
+    if 'register_display_name' in request.session:
+        del request.session['register_display_name']
+    if 'challenge' in request.session:
+        del request.session['challenge']
+    request.session['register_username'] = username
+    request.session['register_display_name'] = display_name
+    request.session['challenge'] = challenge
+    request.session['register_ukey'] = ukey
+
+    make_credential_options = webauthn.WebAuthnMakeCredentialOptions(
+        challenge, rp_name, RP_ID, ukey, username, display_name,
+        'https://chendin.com')
+    temp = make_credential_options.registration_dict
+    #temp['attestation'] = 'direct'
+    return JsonResponse(temp)
+
+def webauthn_begin_assertion(request):
+    print("webauthn_begin_assertion")
+    username = request.POST.get('login_username')
+    challenge = generate_challenge(32)
+    user = User.objects.get(username=username)
+    if 'challenge' in request.session:
+        del request.session['challenge']
+
+    challenge = generate_challenge(32)
+
+    request.session['challenge'] = challenge
+    webauthn_user = webauthn.WebAuthnUser(
+        user.ukey, user.username, user.display_name, user.icon_url,
+        user.credential_id, user.pub_key, user.sign_count, user.rp_id)
+
+    webauthn_assertion_options = webauthn.WebAuthnAssertionOptions(
+        webauthn_user, challenge)
+    return JsonResponse(webauthn_assertion_options.assertion_dict)
+
+def verify_credential_info(request):
+    print("verify_credential_info")
+    # user = authenticate(request, username=username)
+    #global username
+    challenge = request.session['challenge']
+    username = request.session['register_username']
+    display_name = request.session['register_display_name']
+    ukey = request.session['register_ukey']
+    #user = User.objects.get(username=username)
+    #print("user {}".format(user))
+    print("challenge {}".format(challenge))
+    print("username {}".format(username))
+    print("display_name {}".format(display_name))
+    print("ukey {}".format(ukey))
+
+    registration_response = request.POST
+    trust_anchor_dir = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), TRUST_ANCHOR_DIR)
+    trusted_attestation_cert_required = True
+    self_attestation_permitted = True
+    none_attestation_permitted = True
+    webauthn_registration_response = webauthn.WebAuthnRegistrationResponse(
+        RP_ID,
+        ORIGIN,
+        registration_response,
+        challenge,
+        trust_anchor_dir,
+        trusted_attestation_cert_required,
+        self_attestation_permitted,
+        none_attestation_permitted,
+        uv_required=False)
+    print(webauthn_registration_response)
+    try:
+        webauthn_credential = webauthn_registration_response.verify()
+    except Exception as e:
+        return JsonResponse({'fail': 'Registration failed. Error: {}'.format(e)})
+
+    credential_id_exists = User.objects.filter(
+        credential_id=webauthn_credential.credential_id).first()
+    if credential_id_exists:
+        return JsonResponse({'fail': 'Credential ID already exists.'})
+
+    existing_user = User.objects.filter(username=username).first()
+    if not existing_user:
+        if sys.version_info >= (3, 0):
+            webauthn_credential.credential_id = str(
+                webauthn_credential.credential_id, "utf-8")
+        user = User.objects.create(
+            ukey=ukey,
+            username=username,
+            display_name=display_name,
+            pub_key=webauthn_credential.public_key,
+            credential_id=webauthn_credential.credential_id,
+            sign_count=webauthn_credential.sign_count,
+            rp_id=RP_ID,
+            icon_url='https://example.com')
+    else:
+        return JsonResponse({'fail': 'User already exists.'})
+    print('Successfully registered as {}.'.format(username))
+    return JsonResponse({'success': 'User successfully registered.'})
+
+def verify_assertion(request):
+    print("verify_assertion")
+    challenge = request.session.get('challenge', False)
+    assertion_response = request.POST
+    credential_id = assertion_response.get('id')
+
+    user = User.get(credential_id=credential_id)
+    if not user:
+        return JsonResponse({'fail': 'User does not exist.'})
+
+    webauthn_user = webauthn.WebAuthnUser(
+        user.ukey, user.username, user.display_name, user.icon_url,
+        user.credential_id, user.pub_key, user.sign_count, user.rp_id)
+
+    webauthn_assertion_response = webauthn.WebAuthnAssertionResponse(
+        webauthn_user,
+        assertion_response,
+        challenge,
+        ORIGIN,
+        uv_required=False)  # User Verification
+
+    try:
+        sign_count = webauthn_assertion_response.verify()
+    except Exception as e:
+        return JsonResponse({'fail': 'Assertion failed. Error: {}'.format(e)})
+
+    # Update counter.
+    user.sign_count = sign_count
+    user.save()
+
+    login(request, user)
+
+    return JsonResponse({
+        'success':
+            'Successfully authenticated as {}'.format(user.username)
+    })
+
+def generate_challenge(challenge_len):
+    return ''.join([
+        random.SystemRandom().choice(string.ascii_letters + string.digits)
+        for i in range(challenge_len)
+    ])
+
+def generate_ukey():
+    return generate_challenge(20)
+
