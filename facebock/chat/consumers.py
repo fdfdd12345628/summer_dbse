@@ -83,8 +83,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         elif cate == 'notification':
             user_name = text_data_json['user_name']
             notification = await self.put_notification(text=message,
-                                                       from_user=self.user.username,
-                                                       to_user=user_name)
+                                                       from_username=self.user.username,
+                                                       to_username=user_name)
             await self.channel_layer.group_send(
                 user_name,
                 {
@@ -129,7 +129,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'message': message,
                 'from_user': event['from_user'].username,
                 'date': str(now),
-                'id': event['id'].id,
+                'id': event['id'],
             }))
 
     @database_sync_to_async
