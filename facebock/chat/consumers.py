@@ -8,6 +8,7 @@ from .models import Notification, Group, Message, Clients
 import datetime
 import channels
 from channels.layers import get_channel_layer
+from pprint import pprint
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -21,12 +22,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.user = self.scope['user']
             print(self.user.username)
             await self.add_clients()
-        # print(await self.get_all_user_layer(group_name=1))
         # Join room group
-        await self.channel_layer.group_add(
+
+        """await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name,
-        )
+        )"""
+
         await self.channel_layer.group_add(
             self.user_name,
             self.channel_name,
@@ -36,10 +38,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         # Leave room group
-        await self.channel_layer.group_discard(
+        """await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name,
-        )
+        )"""
         await self.channel_layer.group_discard(
             self.user_name,
             self.channel_name,
@@ -50,15 +52,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
+        pprint(text_data_json)
         cate = text_data_json['type']
         # Send message to room group
         if cate == 'chat':
             # groupname = '1'  # text_data_json['groupname']
             groupname = text_data_json['groupname']
-            await self.channel_layer.group_add(
+            '''await self.channel_layer.group_add(
                 groupname,
                 self.channel_name
-            )
+            )'''
             total_channel = await self.get_all_user_layer(group_name=groupname)
             for channel in total_channel:
                 await self.channel_layer.send(
@@ -67,13 +70,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'type': 'chat_message',
                         'message': message,
                         'cate': cate,
-                        'user': User.objects.all(),
+                        # 'user': User.objects.all(),
                         'group_name': groupname,
                         'from_user': self.user
                     }
                 )
             await self.put_message(
-                group=groupname,
+                group_id=groupname,
                 from_user=self.user,
                 text=message,
             )
@@ -93,7 +96,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 }
             )
 
-
     # Receive message from room group
     async def chat_message(self, event):
         message = event['message']
@@ -102,11 +104,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             pass
         now = datetime.datetime.now()
         # Send message to WebSocket
-        group=await self.get_group(event['group_name'])
+        group = await self.get_group(event['group_name'])
         await self.send(text_data=json.dumps({
             'type': 'chat',
             'group_name': event['group_name'],
-            'display_name':group.display_name,
+            'display_name': group.display_name,
             'message': message,
             'from_user': event['from_user'].username,
             'date': now.__str__()
@@ -122,7 +124,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         now = datetime.datetime.now()
         # Send message to WebSocket
         if cate == "notification":
-
             await self.send(text_data=json.dumps({
                 'type': 'notification',
                 'message': message,
@@ -150,10 +151,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                     )
         notification.save()
         return notification
-
-    @database_sync_to_async
-    def get_message(self):
-        pass
 
     @database_sync_to_async
     def get_group(self, group_id):
