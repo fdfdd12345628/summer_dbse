@@ -70,7 +70,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'type': 'chat_message',
                         'message': message,
                         'cate': cate,
-                        # 'user': User.objects.all(),
+                        'user': User.objects.all(),
                         'group_name': groupname,
                         'from_user': self.user
                     }

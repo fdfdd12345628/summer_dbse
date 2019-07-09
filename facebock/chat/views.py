@@ -173,7 +173,7 @@ def verify_credential_info(request):
         credential_id=webauthn_credential.credential_id).first()
     if credential_id_exists:
         return JsonResponse({'fail': 'Credential ID already exists.'})
-
+    # 還敢不訂電腦阿
     existing_user = User.objects.filter(username=username).first()
     if not existing_user:
         if sys.version_info >= (3, 0):
