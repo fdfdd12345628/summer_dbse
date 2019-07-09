@@ -3,8 +3,8 @@ from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 import json
 from channels.db import database_sync_to_async
 from django.contrib import auth
-from django.contrib.auth.models import User
-from .models import Notification, Group, Message, Clients
+
+from .models import Notification, Group, Message, Clients, User
 import datetime
 import channels
 from channels.layers import get_channel_layer

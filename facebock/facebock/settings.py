@@ -127,3 +127,5 @@ STATICFILES_DIRS = [
 ]
 ASGI_APPLICATION = 'facebock.routing.application'
 
+AUTH_USER_MODEL = 'chat.User'
+
