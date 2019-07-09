@@ -12,7 +12,6 @@ RP_ID = 'localhost'
 ORIGIN = 'http://localhost:8000'
 TRUST_ANCHOR_DIR = 'trusted_attestation_roots'
 def index(request):
-
     return render(request, 'chat/index.html', {})
 
 
