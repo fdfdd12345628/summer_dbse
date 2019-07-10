@@ -121,14 +121,15 @@ def webauthn_begin_assertion(request):
         del request.session['challenge']
 
     challenge = generate_challenge(32)
-
+    print("assertion get challenge")
     request.session['challenge'] = challenge
     webauthn_user = webauthn.WebAuthnUser(
         user.ukey, user.username, user.display_name, user.icon_url,
         user.credential_id, user.pub_key, user.sign_count, user.rp_id)
-
+    print("assertion get user")
     webauthn_assertion_options = webauthn.WebAuthnAssertionOptions(
         webauthn_user, challenge)
+    print("go return")
     return JsonResponse(webauthn_assertion_options.assertion_dict)
 
 
@@ -173,16 +174,16 @@ def verify_credential_info(request):
         credential_id=webauthn_credential.credential_id).first()
     if credential_id_exists:
         return JsonResponse({'fail': 'Credential ID already exists.'})
-    # 還敢不訂電腦阿
     existing_user = User.objects.filter(username=username).first()
     if not existing_user:
+        print("create")
         if sys.version_info >= (3, 0):
             webauthn_credential.credential_id = str(
                 webauthn_credential.credential_id, "utf-8")
         user = User.objects.create(
             ukey=ukey,
             username=username,
-            display_name=display_name,
+            display_name=username,
             pub_key=webauthn_credential.public_key,
             credential_id=webauthn_credential.credential_id,
             sign_count=webauthn_credential.sign_count,
@@ -200,10 +201,9 @@ def verify_assertion(request):
     assertion_response = request.POST
     credential_id = assertion_response.get('id')
 
-    user = User.get(credential_id=credential_id)
+    user = User.filter(credential_id=credential_id).first()
     if not user:
         return JsonResponse({'fail': 'User does not exist.'})
-
     webauthn_user = webauthn.WebAuthnUser(
         user.ukey, user.username, user.display_name, user.icon_url,
         user.credential_id, user.pub_key, user.sign_count, user.rp_id)

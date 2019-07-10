@@ -129,3 +129,4 @@ ASGI_APPLICATION = 'facebock.routing.application'
 
 AUTH_USER_MODEL = 'chat.User'
 
+APPEND_SLASH=False

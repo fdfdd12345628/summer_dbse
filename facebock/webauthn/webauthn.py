@@ -219,9 +219,9 @@ class WebAuthnAssertionOptions(object):
             acceptable_credentials.append({
                 'type': 'public-key',
                 'id': user.credential_id,
-                'transports': ['usb', 'nfc', 'ble', 'internal'],
+                
             })
-
+#'transports': ['usb', 'nfc', 'ble', 'internal'],
         assertion_dict = {
             'challenge': self.challenge,
             'allowCredentials': acceptable_credentials,
@@ -1046,6 +1046,7 @@ class WebAuthnAssertionResponse(object):
             # Step 3.
             #
             # Using credential's id attribute (or the corresponding rawId, if
+
             # base64url encoding is inappropriate for your use case), look up
             # the corresponding credential public key.
             if not _validate_credential_id(self.webauthn_user.credential_id):
