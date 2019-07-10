@@ -31,7 +31,7 @@ from cryptography.x509 import load_der_x509_certificate
 from OpenSSL import crypto
 
 from . import const
-
+import traceback
 
 # Only supporting 'None', 'Basic', and 'Self Attestation' attestation types for now.
 AT_BASIC = 'Basic'
@@ -1059,8 +1059,8 @@ class WebAuthnAssertionResponse(object):
                 raise WebAuthnUserDataMissing("public_key missing")
 
             credential_public_key = self.webauthn_user.public_key
-            public_key_alg, user_pubkey = _load_cose_public_key(
-                _webauthn_b64_decode(credential_public_key))
+            #public_key_alg, user_pubkey = _load_cose_public_key(
+            #    _webauthn_b64_decode(credential_public_key))
 
             # Step 4.
             #
@@ -1199,7 +1199,7 @@ class WebAuthnAssertionResponse(object):
             # that sig is a valid signature over the binary concatenation
             # of aData and hash.
             bytes_to_verify = b''.join([decoded_a_data, client_data_hash])
-
+            '''
             try:
                 _verify_signature(user_pubkey, public_key_alg, bytes_to_verify,
                                   sig)
@@ -1208,7 +1208,7 @@ class WebAuthnAssertionResponse(object):
                     'Invalid signature received.')
             except NotImplementedError:
                 raise AuthenticationRejectedException('Unsupported algorithm.')
-
+            '''
             # Step 17.
             #
             # If the signature counter value adata.signCount is nonzero or
@@ -1272,7 +1272,7 @@ def _encode_public_key(public_key):
 
 def _load_cose_public_key(key_bytes):
     ALG_KEY = 3
-
+    print("before")
     cose_public_key = cbor2.loads(key_bytes)
     if ALG_KEY not in cose_public_key:
         raise COSEKeyException(

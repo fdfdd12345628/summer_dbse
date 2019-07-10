@@ -201,7 +201,7 @@ def verify_assertion(request):
     assertion_response = request.POST
     credential_id = assertion_response.get('id')
 
-    user = User.filter(credential_id=credential_id).first()
+    user = User.objects.filter(credential_id=credential_id).first()
     if not user:
         return JsonResponse({'fail': 'User does not exist.'})
     webauthn_user = webauthn.WebAuthnUser(
@@ -214,12 +214,10 @@ def verify_assertion(request):
         challenge,
         ORIGIN,
         uv_required=False)  # User Verification
-
     try:
         sign_count = webauthn_assertion_response.verify()
     except Exception as e:
         return JsonResponse({'fail': 'Assertion failed. Error: {}'.format(e)})
-
     # Update counter.
     user.sign_count = sign_count
     user.save()
