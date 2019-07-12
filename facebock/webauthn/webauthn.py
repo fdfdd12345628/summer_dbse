@@ -31,7 +31,7 @@ from cryptography.x509 import load_der_x509_certificate
 from OpenSSL import crypto
 
 from . import const
-import traceback
+
 
 # Only supporting 'None', 'Basic', and 'Self Attestation' attestation types for now.
 AT_BASIC = 'Basic'
@@ -1272,7 +1272,7 @@ def _encode_public_key(public_key):
 
 def _load_cose_public_key(key_bytes):
     ALG_KEY = 3
-    print("before")
+
     cose_public_key = cbor2.loads(key_bytes)
     if ALG_KEY not in cose_public_key:
         raise COSEKeyException(
