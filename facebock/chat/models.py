@@ -8,7 +8,7 @@ class User(AbstractUser):
     credential_id = models.CharField(max_length=250,blank=True)
     display_name = models.CharField(max_length=160,blank=True)
     pub_key = models.CharField(max_length=65,blank=True)
-    sign_count = models.IntegerField()
+    sign_count = models.IntegerField(blank=True,null=True)
     rp_id = models.CharField(max_length=253,blank=True)
     icon_url = models.CharField(max_length=2083,blank=True)
 
