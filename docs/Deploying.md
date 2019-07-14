@@ -1,12 +1,14 @@
 # Deploying
 
-## 修改Django設定
+## 安裝需要的package
+用 *requirement.txt* 安裝需要的套件
 
+## 修改Django設定
 安裝 *channels*
 	
     pip install -U channels
     
-將 *channels* 加入 *INSTALLED_APPS* 內
+將 *channels* 加入 `INSTALLED_APPS` 內
 
 	INSTALLED_APPS = (
     'django.contrib.auth',
@@ -17,11 +19,11 @@
     'channels',
 	)
     
-在settings.py加入下列屬性
+在 `settings.py` 加入下列屬性
 
 	ASGI_APPLICATION = "myproject.routing.application" # change myproject to your project name
     
-在wsgi.py的資料夾內，加入asgi.py
+在 `wsgi.py` 的資料夾內，加入 `asgi.py`
 
 	"""
     myproject/asgi.py
@@ -36,8 +38,18 @@
 	os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
 	django.setup()
 	application = get_default_application()
-    
-在 `settings.py` 的目錄下，加入 `routing.py`，內容如 `facebock/routing.py`
+
+接著設定 *routing* ，這是websocket的URL，就像 `url.py` 一樣  
+在 `settings.py` 的目錄下，加入 `routing.py`，內容如 `facebock/routing.py`  
+在每個app下新增他們各自的 `routing.py` ，內容如 `chat/routing.py`  
+若要修改或增加websocket的URL，修改各自app的 `routing.py` 內的 `websocket_urlpatterns`  
+```python
+websocket_urlpatterns = [
+    # change or add websocket url here
+    url(r'^ws/chat/(?P<room_name>[^/]+)/$', consumers.ChatConsumer),
+]
+```
+
 安裝教學 <https://channels.readthedocs.io/en/latest/installation.html>
 
 ## 修改User
@@ -94,24 +106,28 @@ from django.contrib.auth.models import User
       ...
 	}
 
-## 使用daphne開啟django
+## 使用uvicorn開啟django
 
-
-切換到project的根目錄，執行daphne
+切換到project的根目錄，執行uvicorn
 	
-    daphne -b 0.0.0.0 -p 8001 myproject.asgi:application
+    uvicorn --host 127.0.0.1 --port 8000 myproject.asgi:application
 
 其中 -b 與 -p 可以分別綁定address與port
 如果用unix socket，則是使用 -u
 
-	daphne -u /tmp/stream.sock myproject.asgi:application
+	uvicorn --uds /tmp/stream.sock myproject.asgi:application
     
-也可以用工具自動執行daphne（例如supervisor等等）
+也可以用工具自動執行uvicorn（例如supervisor等等）
+可以參考 `example_conf` 裡面的 `supervisor.asgi.conf`
 
 部屬教學 <https://channels.readthedocs.io/en/latest/deploying.html>
+
+
 
 ## 其餘參考資料
 1. daphne <https://github.com/django/daphne>
 2. channels <https://channels.readthedocs.io>
+3. uvicorn <https://www.uvicorn.org/>
+
 
 ---
