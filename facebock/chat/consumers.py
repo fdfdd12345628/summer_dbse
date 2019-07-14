@@ -3,8 +3,8 @@ from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 import json
 from channels.db import database_sync_to_async
 from django.contrib import auth
-from django.contrib.auth.models import User
-from .models import Notification, Group, Message, Clients
+
+from .models import Notification, Group, Message, Clients, User
 import datetime
 import channels
 from channels.layers import get_channel_layer
@@ -61,7 +61,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'type': 'chat_message',
                         'message': message,
                         'cate': cate,
-                        # 'user': User.objects.all(),
+                        'user': User.objects.all(),
                         'group_name': groupname,
                         'from_user': self.user
                     }

@@ -1,9 +1,17 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 import datetime
 
 
-# Create your models here.
+class User(AbstractUser):
+    ukey = models.CharField(max_length=20,blank=True)
+    credential_id = models.CharField(max_length=250,blank=True)
+    display_name = models.CharField(max_length=160,blank=True)
+    pub_key = models.CharField(max_length=65,blank=True)
+    sign_count = models.IntegerField(blank=True,null=True)
+    rp_id = models.CharField(max_length=253,blank=True)
+    icon_url = models.CharField(max_length=2083,blank=True)
+
 
 class Group(models.Model):
     user = models.ManyToManyField(User)
@@ -30,3 +38,4 @@ class Message(models.Model):
 class Clients(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     layer = models.CharField(max_length=100)
+

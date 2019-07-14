@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-
     'chat',
 ]
 SITE_ID=1
@@ -128,3 +127,6 @@ STATICFILES_DIRS = [
 ]
 ASGI_APPLICATION = 'facebock.routing.application'
 
+AUTH_USER_MODEL = 'chat.User'
+
+APPEND_SLASH=False

@@ -81,6 +81,8 @@ const didClickRegister = async (e) => {
                 {type: "public-key", alg: -8}
 
         ]
+        console.log("before navigator.credentials")
+        console.log(publicKeyCredentialCreateOptions)
         credential = await navigator.credentials.create({
             publicKey: publicKeyCredentialCreateOptions
         });
@@ -202,7 +204,6 @@ const didClickLogin = async (e) => {
     // gather the data in the form
     const form = document.querySelector('#login-form');
     const formData = new FormData(form);
-
     // post the login data to the server to retrieve the PublicKeyCredentialRequestOptions
     let credentialCreateOptionsFromServer;
     try {
@@ -210,23 +211,21 @@ const didClickLogin = async (e) => {
     } catch (err) {
         return console.error("Error when getting request options from server:", err);
     }
-
     // convert certain members of the PublicKeyCredentialRequestOptions into
     // byte arrays as expected by the spec.    
     const transformedCredentialRequestOptions = transformCredentialRequestOptions(
         credentialRequestOptionsFromServer);
-
     // request the authenticator to create an assertion signature using the
     // credential private key
     let assertion;
     try {
+        console.log(transformedCredentialRequestOptions)
         assertion = await navigator.credentials.get({
             publicKey: transformedCredentialRequestOptions,
         });
     } catch (err) {
         return console.error("Error when creating credential:", err);
     }
-
     // we now have an authentication assertion! encode the byte arrays contained
     // in the assertion data as strings for posting to the server
     const transformedAssertionForServer = transformAssertionForServer(assertion);
@@ -334,8 +333,8 @@ const postAssertionToServer = async (assertionDataForServer) => {
 
 
 document.addEventListener("DOMContentLoaded", e => {
-    console.log($("#register_username").val());
     document.querySelector('#register').addEventListener('click', didClickRegister);
+    document.querySelector('#login').addEventListener('click', didClickLogin);
 });
 
 function getCookie(name) {
