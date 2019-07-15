@@ -26,7 +26,7 @@ from cryptography.hazmat.primitives.asymmetric.ec import (
 from cryptography.hazmat.primitives.asymmetric.padding import (MGF1, PKCS1v15,
                                                                PSS)
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicNumbers
-from cryptography.hazmat.primitives.hashes import SHA256,SHA1
+from cryptography.hazmat.primitives.hashes import SHA256
 from cryptography.x509 import load_der_x509_certificate
 from OpenSSL import crypto
 
@@ -46,8 +46,6 @@ AT_FMT_PACKED = 'packed'
 AT_FMT_NONE = 'none'
 AT_FMT_TPM = 'tpm'
 
-TPM_GENERATED_VALUE = b'\xffTCG'
-TPM_ST_ATTEST_CERTIFY = b'\x80\x17'
 # Only supporting 'fido-u2f', 'packed', and 'none' attestation formats for now.
 SUPPORTED_ATTESTATION_FORMATS = (AT_FMT_FIDO_U2F, AT_FMT_PACKED, AT_FMT_NONE,AT_FMT_TPM)
 
@@ -68,44 +66,6 @@ DEFAULT_CLIENT_EXTENSIONS = {'appid': None, 'loc': None}
 # Default authenticator extensions
 DEFAULT_AUTHENTICATOR_EXTENSIONS = {}
 
-TPM_ALG = {
-    0x0000: "TPM_ALG_ERROR",
-    0x0001: "TPM_ALG_RSA",
-    0x0004: "TPM_ALG_SHA",
-    0x0004: "TPM_ALG_SHA1",
-    0x0005: "TPM_ALG_HMAC",
-    0x0006: "TPM_ALG_AES",
-    0x0007: "TPM_ALG_MGF1",
-    0x0008: "TPM_ALG_KEYEDHASH",
-    0x000A: "TPM_ALG_XOR",
-    0x000B: "TPM_ALG_SHA256",
-    0x000C: "TPM_ALG_SHA384",
-    0x000D: "TPM_ALG_SHA512",
-    0x0010: "TPM_ALG_NULL",
-    0x0012: "TPM_ALG_SM3_256",
-    0x0013: "TPM_ALG_SM4",
-    0x0014: "TPM_ALG_RSASSA",
-    0x0015: "TPM_ALG_RSAES",
-    0x0016: "TPM_ALG_RSAPSS",
-    0x0017: "TPM_ALG_OAEP",
-    0x0018: "TPM_ALG_ECDSA",
-    0x0019: "TPM_ALG_ECDH",
-    0x001A: "TPM_ALG_ECDAA",
-    0x001B: "TPM_ALG_SM2",
-    0x001C: "TPM_ALG_ECSCHNORR",
-    0x001D: "TPM_ALG_ECMQV",
-    0x0020: "TPM_ALG_KDF1_SP800_56A",
-    0x0021: "TPM_ALG_KDF2",
-    0x0022: "TPM_ALG_KDF1_SP800_108",
-    0x0023: "TPM_ALG_ECC",
-    0x0025: "TPM_ALG_SYMCIPHER",
-    0x0026: "TPM_ALG_CAMELLIA",
-    0x0040: "TPM_ALG_CTR",
-    0x0041: "TPM_ALG_OFB",
-    0x0042: "TPM_ALG_CBC",
-    0x0043: "TPM_ALG_CFB",
-    0x0044: "TPM_ALG_ECB"
-}
 
 class COSEKeyException(Exception):
     pass
@@ -218,9 +178,9 @@ class WebAuthnAssertionOptions(object):
             acceptable_credentials.append({
                 'type': 'public-key',
                 'id': user.credential_id,
-                
+                'transports': ['usb', 'nfc', 'ble', 'internal'],
             })
-#'transports': ['usb', 'nfc', 'ble', 'internal'],
+
         assertion_dict = {
             'challenge': self.challenge,
             'allowCredentials': acceptable_credentials,
@@ -627,103 +587,30 @@ class WebAuthnRegistrationResponse(object):
             Verify that the public key specified by the parameters and unique fields of pubArea is identical 
             to the credentialPublicKey in the attestedCredentialData in authenticatorData.
             '''
+            try:
+                public_key_alg, credential_public_key = _load_cose_public_key(
+                    credential_pub_key)
+            except COSEKeyException as e:
+                raise RegistrationRejectedException(str(e))
+            print("safe")
+            print(att_stmt.get("pubArea"))
+            print(type(att_stmt.get('pubArea')))
             pubArea = att_stmt.get('pubArea')
-            pubArea_type = codecs.encode(pubArea[0:2],'hex')
-            if pubArea_type == b'0001':
-                pubArea_parms_len = 10
-                # "TPM_ALG_RSA"
-            elif pubArea_type == b'0023':
-                pubArea_parms_len = 8
-                # "TPM_ALG_ECC"
-            else:
-                raise RegistrationRejectedException('Bad public key.')
-            pubArea_Auth_policy_len = struct.unpack('!H',pubArea[ 8 : 10 ])[0]
-            Auth_policy = pubArea[ 10 : 10 + pubArea_Auth_policy_len ]
-            # Auth_policy ignore
-            pubArea_parms = pubArea[10 + pubArea_Auth_policy_len : 10 + pubArea_Auth_policy_len + pubArea_parms_len ]
-            pubArea_unique_len = struct.unpack('!H',pubArea[ 10 + pubArea_Auth_policy_len + pubArea_parms_len : 12 + pubArea_Auth_policy_len + pubArea_parms_len ])[0]
-            pubArea_unique = pubArea[ 12 + pubArea_Auth_policy_len + pubArea_parms_len : 12 + pubArea_Auth_policy_len + pubArea_parms_len + pubArea_unique_len ]
-            #print('pubArea_parms : ',pubArea_parms)
-            #print('pubArea_unique : ',pubArea_unique)
-            if pubArea_type == b'0001':
-                credential_public_key = cbor2.loads(credential_pub_key)[-1]
-                credential_alg = cbor2.loads(credential_pub_key)[-2]
-            #print('credential_public_key : ',credential_public_key)
-            #print('credential_alg : ',credential_alg)
-            if pubArea_unique != credential_public_key:
-                raise RegistrationRejectedException("pubArea Error")
-            attToBeSigned =b''.join([b'', auth_data, client_data_hash])
+            print(struct.unpack('!H',pubArea[52:54])[0])
+            print(pubArea[54:310])
+            print(credential_public_key)
+            print("in tpm step2")
+            att_cert = att_stmt.get('x5c')[0]
+            x509_att_cert = load_der_x509_certificate(att_cert,
+                                                      default_backend())
+            certificate_public_key = x509_att_cert.public_key()
+            if not isinstance(certificate_public_key.curve, SECP256R1):
+                raise RegistrationRejectedException(
+                    'Bad certificate public key.')
+            print("safe")
 
-            certInfo = att_stmt.get('certInfo')
-            #magic
-            certInfo_magic = certInfo[ 0 : 4 ]
-            #type
-            certInfo_type = certInfo[ 4 : 6 ]
-            #qualified signer
-            certInfo_qualified_signer_len = struct.unpack('!H',certInfo[ 6 : 8 ])[0]
-            certInfo_qualified_signer = certInfo[ 8 : 8 + certInfo_qualified_signer_len ]
-            #extra data
-            certInfo_extra_data_len = struct.unpack('!H',certInfo[ 8 + certInfo_qualified_signer_len : 10 + certInfo_qualified_signer_len ])[0]
-            certInfo_extra_data = certInfo[ 10 + certInfo_qualified_signer_len : 10 + certInfo_qualified_signer_len + certInfo_extra_data_len ]
-            #clock info
-            qs_ed_len = certInfo_qualified_signer_len + certInfo_extra_data_len
-            certInfo_clockInfo = certInfo[ 10 + qs_ed_len: 27 + qs_ed_len ]
-            #Firmware version
-            certInfo_Firmware_ver = certInfo[ 27 + qs_ed_len : 35 + qs_ed_len ]
-            #Attested Name
-            certInfo_Attested_Name_len = struct.unpack('!H',certInfo[ 35 + qs_ed_len : 37 + qs_ed_len ])[0]
-            certInfo_Attested_Name = certInfo[ 37 + qs_ed_len : 37 + qs_ed_len + certInfo_Attested_Name_len]
-            #Attested Qualified Name
-            certInfo_Attested_Qualified_Name_len = struct.unpack('!H',certInfo[ 37 + qs_ed_len + certInfo_Attested_Name_len : 39 + qs_ed_len + certInfo_Attested_Name_len])[0]
-            certInfo_Attested_Qualified_Name = certInfo[39 + qs_ed_len + certInfo_Attested_Name_len : 39 + qs_ed_len + certInfo_Attested_Name_len + certInfo_Attested_Qualified_Name_len ]
-            print("magic : ",certInfo_magic)
-            print("type : ",certInfo_type)
-            print("qualified_signer : ",certInfo_qualified_signer)
-            print("extra data : ",certInfo_extra_data)
-            print("clock info : ",certInfo_clockInfo)
-            print("firmware version : ",certInfo_Firmware_ver)
-            print("attested name : ",certInfo_Attested_Name)
-            print("attested qulified name : ",certInfo_Attested_Qualified_Name)
-            if certInfo_magic != TPM_GENERATED_VALUE:
-                raise RegistrationRejectedException("Magic Error")
-            if certInfo_type != TPM_ST_ATTEST_CERTIFY:
-                raise RegistrationRejectedException("CertInfo Type Error")
-            #print(TPM_ALG[int('0x'+certInfo_Attested_Name[0:2].hex(),16)])
-            if TPM_ALG[int('0x'+certInfo_Attested_Name[0:2].hex(),16)] == "TPM_ALG_SHA256":
-                pubAreaHash = hashlib.sha256(pubArea).digest()
-            attestedName = b''.join([b'', certInfo_Attested_Name[0:2] , pubAreaHash])
-            if attestedName != certInfo_Attested_Name:
-                raise RegistrationRejectedException("Attested Name not equal to certInfo.AttestedName")
-            print("attestedName : ",attestedName)
-            print("attested.name : ",certInfo_Attested_Name)
-            #attToBeSignedHash = hashlib.sha256(ToBeSigned).digest()
-            #print("attToBeSignedHash ; ",attToBeSignedHash)
-            #print("Extra Data : ",certInfo_extra_data)
-
-            alg = att_stmt.get("alg")
-            signature = att_stmt['sig']
-            verification_data = b''.join([auth_data, client_data_hash])
-            if 'x5c' in att_stmt:
-                att_cert = att_stmt['x5c'][0]
-                x509_att_cert = load_der_x509_certificate(
-                    att_cert, default_backend())
-                certificate_public_key = x509_att_cert.public_key()
-                '''
-                try:
-                    _verify_signature(certificate_public_key, alg,
-                                      verification_data, signature)
-                except InvalidSignature:
-                    raise RegistrationRejectedException(
-                        'Invalid signature received.')
-                except NotImplementedError:
-                    raise RegistrationRejectedException(
-                        'Unsupported algorithm.')
-                '''
-                attestation_type = AT_BASIC
-                trust_path = [x509_att_cert]
-            else:
-                raise RegistrationRejectedException("not support")
             return (attestation_type, trust_path, credential_pub_key, cred_id)
+
         else:
             raise RegistrationRejectedException('Invalid format.')
 
@@ -1057,8 +944,8 @@ class WebAuthnAssertionResponse(object):
                 raise WebAuthnUserDataMissing("public_key missing")
 
             credential_public_key = self.webauthn_user.public_key
-            #public_key_alg, user_pubkey = _load_cose_public_key(
-            #    _webauthn_b64_decode(credential_public_key))
+            public_key_alg, user_pubkey = _load_cose_public_key(
+                _webauthn_b64_decode(credential_public_key))
 
             # Step 4.
             #
@@ -1197,7 +1084,7 @@ class WebAuthnAssertionResponse(object):
             # that sig is a valid signature over the binary concatenation
             # of aData and hash.
             bytes_to_verify = b''.join([decoded_a_data, client_data_hash])
-            '''
+
             try:
                 _verify_signature(user_pubkey, public_key_alg, bytes_to_verify,
                                   sig)
@@ -1206,7 +1093,7 @@ class WebAuthnAssertionResponse(object):
                     'Invalid signature received.')
             except NotImplementedError:
                 raise AuthenticationRejectedException('Unsupported algorithm.')
-            '''
+
             # Step 17.
             #
             # If the signature counter value adata.signCount is nonzero or
@@ -1272,6 +1159,7 @@ def _load_cose_public_key(key_bytes):
     ALG_KEY = 3
 
     cose_public_key = cbor2.loads(key_bytes)
+
     if ALG_KEY not in cose_public_key:
         raise COSEKeyException(
             'Public key missing required algorithm parameter.')
@@ -1306,6 +1194,10 @@ def _load_cose_public_key(key_bytes):
             raise COSEKeyException('Public key must match COSE_Key spec.')
 
         if len(cose_public_key[E_KEY]) != 256 or len(cose_public_key[N_KEY]) != 3:
+            print(len(cose_public_key[E_KEY]))
+            print(len(cose_public_key[N_KEY]))
+            print(int(codecs.encode(cose_public_key[E_KEY], 'hex'), 16))
+            print(int(codecs.encode(cose_public_key[N_KEY], 'hex'), 16))
             raise COSEKeyException('Bad public key.')
 
         e = int(codecs.encode(cose_public_key[E_KEY], 'hex'), 16)
@@ -1357,7 +1249,7 @@ def _get_trust_anchors(attestation_type, attestation_fmt, trust_anchor_dir):
     if os.path.isdir(ta_dir):
         for ta_name in os.listdir(ta_dir):
             ta_path = os.path.join(ta_dir, ta_name)
-            if os.path.isfile(ta_path): 
+            if os.path.isfile(ta_path):
                 with open(ta_path, 'rb') as f:
                     pem_data = f.read().strip()
                     try:
@@ -1371,8 +1263,6 @@ def _get_trust_anchors(attestation_type, attestation_fmt, trust_anchor_dir):
 
 
 def _is_trusted_attestation_cert(trust_path, trust_anchors):
-    print(trust_path)
-    print(trust_anchors)
     if not trust_path or not isinstance(trust_path, list):
         return False
     # NOTE: Only using the first attestation cert in the
@@ -1382,14 +1272,14 @@ def _is_trusted_attestation_cert(trust_path, trust_anchors):
     store = crypto.X509Store()
     for _ta in trust_anchors:
         store.add_cert(_ta)
-
     store_ctx = crypto.X509StoreContext(store, attestation_cert)
-    print(store_ctx)	
+
     try:
-        #store_ctx.verify_certificate()
+        store_ctx.verify_certificate()
         return True
     except Exception as e:
         print('Unable to verify certificate: {}.'.format(e), file=sys.stderr)
+
     return False
 
 

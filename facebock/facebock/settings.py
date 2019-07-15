@@ -85,7 +85,15 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
-
+'''CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+    }
+'''
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
@@ -127,3 +135,6 @@ STATICFILES_DIRS = [
 ]
 ASGI_APPLICATION = 'facebock.routing.application'
 
+AUTH_USER_MODEL = 'chat.User'
+
+APPEND_SLASH=False
