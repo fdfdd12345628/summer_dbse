@@ -22,7 +22,7 @@
 在 `settings.py` 加入下列屬性
 
 	ASGI_APPLICATION = "myproject.routing.application" # change myproject to your project name
-    
+	
 在 `wsgi.py` 的資料夾內，加入 `asgi.py`
 
 	"""
@@ -38,6 +38,8 @@
 	os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
 	django.setup()
 	application = get_default_application()
+	
+
 
 接著設定 *routing* ，這是websocket的URL，就像 `url.py` 一樣  
 在 `settings.py` 的目錄下，加入 `routing.py`，內容如 `facebock/routing.py`  

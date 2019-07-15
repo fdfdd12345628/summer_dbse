@@ -47,7 +47,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
-        pprint(text_data_json)
         cate = text_data_json['type']
         # Send message to room group
         if cate == 'chat':
@@ -65,7 +64,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'cate': cate,
                         'user': User.objects.all(),
                         'group_name': groupname,
-                        'from_user': self.user
+                        'from_user': self.user.username
                     }
                 )
             # save to database
@@ -105,7 +104,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'group_name': event['group_name'],
             'display_name': group.display_name,
             'message': message,
-            'from_user': event['from_user'].username,
+            'from_user': event['from_user'],
             'date': now.__str__()
         }))
 
