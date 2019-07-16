@@ -19,6 +19,7 @@ mysql比sqlite好(防止資料庫鎖定問題)
 ####每秒能處理的訊息
 在不同執行序下，每種配置所能處理的websocket訊息上限
 * 1 django, 1 mysql: 97 requests per second
+* 1 django, 1 mysql: 208 requests per second
 * 1 django, 4 mysql: 95 requests per second
 * 4 django, 1 mysql: 232 requests per second
 * 4 django, 4 mysql: 235 requests per second

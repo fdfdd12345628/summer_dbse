@@ -27,6 +27,17 @@ class Notification(models.Model):
     seen = models.BooleanField()
 
 
+class Notification_2(models.Model):
+    from_user = models.ForeignKey(User, on_delete=None, related_name='notification_from_user_2')
+    to_user = models.ForeignKey(User, on_delete=None, related_name='notification_to_user_2')
+    content = models.CharField(max_length=1000)
+    date = models.DateTimeField()
+    seen = models.BooleanField()
+
+    class Meta:
+        app_label = 'mysql_2'
+
+
 class Message(models.Model):
     from_user = models.ForeignKey(User, on_delete=None, related_name='message_from_user')
     content = models.CharField(max_length=1000)

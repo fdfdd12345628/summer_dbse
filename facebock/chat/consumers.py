@@ -1,17 +1,20 @@
-import asyncio
-
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 import json
 from channels.db import database_sync_to_async
 from django.contrib import auth
 
-from .models import Notification, Group, Message, Clients, User
+from .models import Notification, Group, Message, Clients, User, Notification_2
 import datetime
 import channels
 from channels.layers import get_channel_layer
-from pprint import pprint
-DEBUG=True
+from random import randrange
+
+DEBUG = True
+
+
+# from pprint import pprint
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -19,13 +22,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.room_group_name = 'chat_%s' % self.room_name
         if self.scope["user"].is_anonymous:
             self.user_name = "anonymous"
-            if DEBUG:
-                self.user=await self.get_user(user_id=1)
         else:
             self.user_name = self.scope["user"].username
             self.user = self.scope['user']
+            print(self.user.username)
             await self.add_clients()
-        # print(self.user)
         # Join room group
         # add user to group that the name is as same as current user
         await self.channel_layer.group_add(
@@ -58,7 +59,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             total_channel = await self.get_all_user_layer(group_name=groupname)
             # send to all websocket
             for channel in total_channel:
-
                 await self.channel_layer.send(
                     channel,
                     {
@@ -67,7 +67,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'cate': cate,
                         'user': User.objects.all(),
                         'group_name': groupname,
-                        'from_user': self.user.username
+                        'from_user': self.user
                     }
                 )
             # save to database
@@ -90,7 +90,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'type': 'notification_message',
                     'message': message,
                     'cate': cate,
-                    'from_user': self.user.username,
+                    'from_user': self.user,
                     'id': notification.id
                 }
             )
@@ -107,7 +107,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'group_name': event['group_name'],
             'display_name': group.display_name,
             'message': message,
-            'from_user': event['from_user'],
+            'from_user': event['from_user'].username,
             'date': now.__str__()
         }))
 
@@ -120,7 +120,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps({
                 'type': 'notification',
                 'message': message,
-                'from_user': event['from_user'],
+                'from_user': event['from_user'].username,
                 'date': str(now),
                 'id': event['id'],
             }))
@@ -132,18 +132,26 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_user(self, user_id):
-        a=User.objects.get(pk=user_id)
-        return a
+        return User.objects.get(pk=user_id)
 
     @database_sync_to_async
     def put_notification(self, text, from_username, to_username):
-        notification = Notification(from_user=User.objects.get(username=from_username),
-                                    to_user=User.objects.get(username=to_username),
-                                    content=text,
-                                    date=datetime.datetime.now(),
-                                    seen=False,
-                                    )
-        notification.save()
+        if randrange(2):
+            notification = Notification(from_user=User.objects.get(username=from_username),
+                                        to_user=User.objects.get(username=to_username),
+                                        content=text,
+                                        date=datetime.datetime.now(),
+                                        seen=False,
+                                        )
+            notification.save()
+        else:
+            notification = Notification_2(from_user=User.objects.get(username=from_username),
+                                          to_user=User.objects.get(username=to_username),
+                                          content=text,
+                                          date=datetime.datetime.now(),
+                                          seen=False,
+                                          )
+            notification.save()
         return notification
 
     @database_sync_to_async
