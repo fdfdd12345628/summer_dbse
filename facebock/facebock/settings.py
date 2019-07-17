@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'chat',
+    'test_ws',
 ]
 SITE_ID=1
 MIDDLEWARE = [
@@ -72,16 +73,14 @@ WSGI_APPLICATION = 'facebock.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-DATABASE_APPS_MAPPING = {'mysql_2': 'mysql_2', }
+DATABASE_APPS_MAPPING = {'chat': 'mysql_1', 'test_ws': 'mysql_2'}
+DATABASE_ROUTERS = ['facebock.database_router.DatabaseAppsRouter']
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': (os.path.join('db.sqlite3')),
-        'USER': 'root',
-        'PASSWORD': 'password',
-        'HOST': '127.0.0.1',
-        'PORT': 3310
+
     },
     'mysql_1': {
         'ENGINE': 'django.db.backends.mysql',

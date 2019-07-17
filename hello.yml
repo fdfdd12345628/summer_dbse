@@ -1,8 +1,8 @@
 config:
   target: "ws://localhost:8000/ws/test/"
   phases:
-    - duration: 20
-      arrivalCount: 10
+    - duration: 5
+      arrivalCount: 20
 
 scenarios:
   - engine: "ws"

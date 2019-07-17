@@ -46,20 +46,8 @@ class Clients(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     layer = models.CharField(max_length=100)
 
-
 class Notification_test(models.Model):
     content = models.CharField(max_length=1000)
     date = models.DateTimeField()
     seen = models.BooleanField()
 
-    class Meta:
-        app_label = 'mysql_1'
-
-
-class Notification_2_test(models.Model):
-    content = models.CharField(max_length=1000)
-    date = models.DateTimeField()
-    seen = models.BooleanField()
-
-    class Meta:
-        app_label = 'mysql_2'
