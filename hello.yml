@@ -1,0 +1,12 @@
+config:
+  target: "ws://localhost:8000/ws/test/"
+  phases:
+    - duration: 20
+      arrivalCount: 10
+
+scenarios:
+  - engine: "ws"
+    flow:
+      - send:
+          content: "你好你好你好你好你好你好你好你好你好你好"
+          type: "notification"

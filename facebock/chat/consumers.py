@@ -4,7 +4,7 @@ import json
 from channels.db import database_sync_to_async
 from django.contrib import auth
 
-from .models import Notification, Group, Message, Clients, User, Notification_2
+from .models import Notification, Group, Message, Clients, User, Notification_2, Notification_2_test, Notification_test
 import datetime
 import channels
 from channels.layers import get_channel_layer
@@ -194,3 +194,54 @@ class ChatConsumer(AsyncWebsocketConsumer):
         group = Group.objects.get(pk=group_name)
         all_layer = Clients.objects.filter(user__in=[each for each in group.user.all()])
         return [layer.layer for layer in all_layer]
+
+
+class TestConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.channel_layer.group_add(
+            'asd',
+            self.channel_name,
+        )
+
+    async def receive(self, text_data=None, bytes_data=None):
+        text_data_json = json.loads(text_data)
+        message = text_data_json['content']
+        content_type = text_data_json['type']
+        if content_type == 'chat':
+            pass
+        elif content_type == 'notification':
+            await self.put_notification()
+            await self.channel_layer.group_send(
+                'asd',
+                {
+                    'type': 'notification_message',
+                    'message': message,
+                    'cate': 'noti',
+                    'from_user': 'asd',
+                    'id': 1
+                }
+            )
+
+    async def notification_message(self, event):
+        message = event['message']
+        cate = event['cate']
+        now = datetime.datetime.now()
+        # Send message to WebSocket
+        pass
+
+    @database_sync_to_async
+    def put_notification(self, text):
+        if randrange(2):
+            notification = Notification_test(content=text,
+                                             date=datetime.datetime.now(),
+                                             seen=False,
+                                             )
+            notification.save()
+        else:
+            notification = Notification_2_test(content=text,
+                                               date=datetime.datetime.now(),
+                                               seen=False,
+                                               )
+            notification.save()
+        return notification
+        pass

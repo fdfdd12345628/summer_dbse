@@ -34,10 +34,6 @@ class Notification_2(models.Model):
     date = models.DateTimeField()
     seen = models.BooleanField()
 
-    class Meta:
-        app_label = 'mysql_2'
-
-
 class Message(models.Model):
     from_user = models.ForeignKey(User, on_delete=None, related_name='message_from_user')
     content = models.CharField(max_length=1000)
@@ -50,3 +46,20 @@ class Clients(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     layer = models.CharField(max_length=100)
 
+
+class Notification_test(models.Model):
+    content = models.CharField(max_length=1000)
+    date = models.DateTimeField()
+    seen = models.BooleanField()
+
+    class Meta:
+        app_label = 'mysql_1'
+
+
+class Notification_2_test(models.Model):
+    content = models.CharField(max_length=1000)
+    date = models.DateTimeField()
+    seen = models.BooleanField()
+
+    class Meta:
+        app_label = 'mysql_2'
