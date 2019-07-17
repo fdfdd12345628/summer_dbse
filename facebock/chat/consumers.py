@@ -202,15 +202,22 @@ class TestConsumer(AsyncWebsocketConsumer):
             'asd',
             self.channel_name,
         )
+        await self.accept()
+
+    async def disconnect(self, code):
+        await self.channel_layer.group_discard(
+            'asd',
+            self.channel_name,
+        )
 
     async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
-        message = text_data_json['content']
+        message = text_data_json['message']
         content_type = text_data_json['type']
         if content_type == 'chat':
             pass
         elif content_type == 'notification':
-            await self.put_notification()
+            await self.put_notification(text=message)
             await self.channel_layer.group_send(
                 'asd',
                 {
