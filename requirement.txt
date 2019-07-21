@@ -1,4 +1,6 @@
 Django==2.2.2
 channels==2.2.0
 uvicorn==0.8.4
+webauthn==0.4.5
+service_identity==18.1.0
 

@@ -125,7 +125,7 @@ $(function(){
 				console.log("success");
 				console.log(content["id"])
                 if($("#display_room_" + content["id"] ).length == 0) {
-                    $("#ChatRoom_Position").append('<div class="col-md-6 col-xl-6 chat" id="display_room_'+content["id"]+'"><div class="card"><div class="card-header msg_head"><div class="d-flex bd-highlight"><div class="img_cont"><img src="https://image.flaticon.com/icons/svg/784/784662.svg" class="rounded-circle user_img"><span class="online_icon"></span></div><div class="user_info"><span>'+content["display_name"]+'</span></div></div></div><div class="card-body msg_card_body"></div><div class="card-footer"><div class="input-group"><div class="input-group-append"><span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span></div><textarea name="" class="form-control type_msg" placeholder="Type your message..."></textarea><div class="input-group-append"><span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span></div></div></div></div></div>')
+                    $("#ChatRoom_Position").append('<div class="col-md-6 col-xl-6 chat" id="display_room_'+content["id"]+'"><div class="card"><i class="chatroom_close material-icons">close</i><div class="card-header msg_head"><div class="d-flex bd-highlight"><div class="img_cont"><img src="https://image.flaticon.com/icons/svg/784/784662.svg" class="rounded-circle user_img"><span class="online_icon"></span></div><div class="user_info"><span>'+content["display_name"]+'</span></div></div></div><div class="card-body msg_card_body"></div><div class="card-footer"><div class="input-group"><div class="input-group-append"><span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span></div><textarea name="" class="form-control type_msg" placeholder="Type your message..."></textarea><div class="input-group-append"><span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span></div></div></div></div></div>')
                 }
        		},
         })
@@ -146,7 +146,7 @@ $(function(){
     $(".exist_room").click(function(){
         console.log(this.id)
         if($("#display_" + this.id ).length == 0) {
-            $("#ChatRoom_Position").append('<div class="col-md-6 col-xl-6 chat" id="display_'+this.id+'"><div class="card"><div class="card-header msg_head"><div class="d-flex bd-highlight"><div class="img_cont"><img src="https://image.flaticon.com/icons/svg/784/784662.svg" class="rounded-circle user_img"><span class="online_icon"></span></div><div class="user_info"><span>'+$("#"+this.id).find(".user_info > span").text()+'</span></div></div></div><div class="card-body msg_card_body"></div><div class="card-footer"><div class="input-group"><div class="input-group-append"><span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span></div><textarea name="" class="form-control type_msg" placeholder="Type your message..."></textarea><div class="input-group-append"><span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span></div></div></div></div></div>')
+            $("#ChatRoom_Position").append('<div class="col-md-6 col-xl-6 chat" id="display_'+this.id+'"><div class="card"><i class="chatroom_close material-icons">close</i><div class="card-header msg_head"><div class="d-flex bd-highlight"><div class="img_cont"><img src="https://image.flaticon.com/icons/svg/784/784662.svg" class="rounded-circle user_img"><span class="online_icon"></span></div><div class="user_info"><span>'+$("#"+this.id).find(".user_info > span").text()+'</span></div></div></div><div class="card-body msg_card_body"></div><div class="card-footer"><div class="input-group"><div class="input-group-append"><span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span></div><textarea name="" class="form-control type_msg" placeholder="Type your message..."></textarea><div class="input-group-append"><span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span></div></div></div></div></div>')
         }
     })
     /******
@@ -184,5 +184,8 @@ $(function(){
         groupname: 判斷ws傳送對象 ( "group" )
         {因 通知對人 聊天對聊天室}
     ******/
+    $(document).on("click",".chatroom_close",function (e) {
+        $(this).parent().parent().remove()
+    })
 })
 

@@ -1,31 +1,118 @@
 <html>
-    {% load static %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.js"></script>
-    <script src="{% static 'js/base64.js' %}"></script>
-    <script src="{% static 'js/webauthn.js' %}"></script>
-    <title>WebAuthn Test</title>
-    <body>
-        <h1>WebAuthn Test</h1>
-        {% if current_user.is_authenticated %}
-        <p>Logged in as {{ current_user.username }} | <a href="">Logout</a></p>
-        {% else %}
-            <h2>Register</h2>
-            <form id="register-form" name="register" method="get">{% csrf_token %}
-                <label for="register_username">Username:</label>
-                <input name="register_username">
-                <label for="register_display_name">Display Name:</label>
-                <input name="register_display_name">
-                <button id="register" type="submit">Register with WebAuthn</button>
-            </form>
+{% load static %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.js"></script>
+<script src="{% static 'js/base64.js' %}"></script>
+<script src="{% static 'js/webauthn.js' %}"></script>
+<title>WebAuthn Test</title>
+<body>
+<h1>WebAuthn Test</h1>
+{% if request.user.is_authenticated %}
+<p>Logged in as {{ request.user.username }} </p>
+<button type="button" id="logout"> logout </button>
+{% else %}
+<h2>Webauthn Register</h2>
+<form id="register-form" name="register" method="get">{% csrf_token %}
+    <label for="register_username">Username:</label>
+    <input name="register_username">
+    <label for="register_display_name">Display Name:</label>
+    <input name="register_display_name">
+    <button id="register" type="submit">Register with WebAuthn</button>
+</form>
 
-            <hr>
+<hr>
 
-            <h2>Log In</h2>
-            <form id="login-form" name="login" method="get">{% csrf_token %}
-                <label for="login_username">Username:</label>
-                <input name="login_username">
-                <button id="login" type="submit">Log in with WebAuthn</button>
-            </form>
-        {% endif %}
-    </body>
+<h2>Webauthn Log In</h2>
+<form id="login-form" name="login" method="get">{% csrf_token %}
+    <label for="login_username">Username:</label>
+    <input name="login_username">
+    <button id="login" type="submit">Log in with WebAuthn</button>
+</form>
+<br><hr><br>
+<h2>Normal Register</h2>
+<form id="normal-register-form" name="register" method="get">{% csrf_token %}
+    <label for="normal_register_username">Username:</label>
+    <input id="normal_register_username" name="normal_register_username">
+    <label for="normal_register_password">Password</label>
+    <input id="normal_register_password" name="normal_register_password" type="password">
+    <button id="normal-register" type="button">Register</button>
+</form>
+
+<hr>
+
+<h2>Normal Log In</h2>
+<form id="normal-login-form" name="login" method="get">{% csrf_token %}
+    <label for="normal_login_username">Username:</label>
+    <input id="normal_login_username" name="normal_login_username">
+    <label for="normal_login_password">Password</label>
+    <input id="normal_login_password" name="normal_login_password" type="password">
+    <button id="normal-login" type="button">Login</button>
+</form>
+{% endif %}
+</body>
 </html>
+<script>
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+    $("#normal-register").click(function () {
+        $.ajax({
+            type:'POST',
+            url:'',
+            data:{
+                type: "register",
+                username :$("#normal_register_username").val(),
+                password: $("#normal_register_password").val(),
+                csrfmiddlewaretoken:csrftoken
+            },
+            success:function (content) {
+                alert(content.message);
+                location.reload();
+            }
+        })
+    })
+    $("#normal-login").click(function () {
+        $.ajax({
+            type:'POST',
+            url:'',
+            dataType:"json",
+            data:{
+                type: "login",
+                username :$("#normal_login_username").val(),
+                password: $("#normal_login_password").val(),
+                'csrfmiddlewaretoken':csrftoken
+            },
+            success:function (content) {
+                alert(content.message);
+                location.reload();
+            }
+        })
+    })
+    $("#logout").click(function () {
+        $.ajax({
+            type:'POST',
+            url:'',
+            dataType:"json",
+            data:{
+                type: "logout",
+                'csrfmiddlewaretoken':csrftoken
+            },
+            success:function (content) {
+                console.log(content.message);
+                location.reload();
+            }
+        })
+    })
+</script>

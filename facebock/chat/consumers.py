@@ -47,7 +47,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
-        pprint(text_data_json)
+        print(text_data_json)
         cate = text_data_json['type']
         # Send message to room group
         if cate == 'chat':

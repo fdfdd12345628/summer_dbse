@@ -107,3 +107,6 @@ await self.send(text_data=json.dumps({
     'id': event['id'].id,
 }))
 ```
+
+##  
+[channel 參考資料](https://channels.readthedocs.io/en/latest/)
