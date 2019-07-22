@@ -5,8 +5,9 @@
 
 ## 修改Django設定
 安裝 *channels*
-	
-    pip install -U channels
+```bash
+pip install -U channels
+```
     
 將 *channels* 加入 `INSTALLED_APPS` 內
 
@@ -22,7 +23,7 @@
 在 `settings.py` 加入下列屬性
 
 	ASGI_APPLICATION = "myproject.routing.application" # change myproject to your project name
-    
+	
 在 `wsgi.py` 的資料夾內，加入 `asgi.py`
 
 	"""
@@ -38,6 +39,8 @@
 	os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
 	django.setup()
 	application = get_default_application()
+	
+
 
 接著設定 *routing* ，這是websocket的URL，就像 `url.py` 一樣  
 在 `settings.py` 的目錄下，加入 `routing.py`，內容如 `facebock/routing.py`  
@@ -50,7 +53,7 @@ websocket_urlpatterns = [
 ]
 ```
 
-安裝教學 <https://channels.readthedocs.io/en/latest/installation.html>
+補充：安裝教學 <https://channels.readthedocs.io/en/latest/installation.html>
 
 ## 修改User
 在 `models.py`
@@ -122,12 +125,12 @@ from django.contrib.auth.models import User
 
 部屬教學 <https://channels.readthedocs.io/en/latest/deploying.html>
 
-
+## 指紋的架設方式
+參考 `fingerprint.md` 內的說明
 
 ## 其餘參考資料
 1. daphne <https://github.com/django/daphne>
 2. channels <https://channels.readthedocs.io>
 3. uvicorn <https://www.uvicorn.org/>
-
 
 ---
