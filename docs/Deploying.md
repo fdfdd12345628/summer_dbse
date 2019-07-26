@@ -121,12 +121,13 @@ from django.contrib.auth.models import User
 	uvicorn --uds /tmp/stream.sock myproject.asgi:application
     
 也可以用工具自動執行uvicorn（例如supervisor等等）
-可以參考 `example_conf` 裡面的 `supervisor.asgi.conf`
+可以參考 `example_conf` 裡面的 `supervisor.asgi.conf`  
+*記得要將Django的DEBUG關掉*  
 
 部屬教學 <https://channels.readthedocs.io/en/latest/deploying.html>
 
 ## 指紋的架設方式
-參考 `fingerprint.md` 內的說明
+參考 `fingerprint.md` 內的說明，基本上已經包含在view.py內了。
 
 ## 其餘參考資料
 1. daphne <https://github.com/django/daphne>
