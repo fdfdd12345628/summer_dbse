@@ -42,7 +42,7 @@ chatSocket.onmessage = function(e) {
     } else if (message.type === 'offer') {
       if(username !== data['from_user']) {
         if (!isInitiator && !isStarted) {
-          maybeStart();
+          //maybeStart();
         }
         pc.setRemoteDescription(new RTCSessionDescription(message));
         doAnswer();
@@ -52,11 +52,13 @@ chatSocket.onmessage = function(e) {
         pc.setRemoteDescription(new RTCSessionDescription(message));
       }
     } else if (message.type === 'candidate' && isStarted) {
-      var candidate = new RTCIceCandidate({
-        sdpMLineIndex: message.label,
-        candidate: message.candidate
-      });
-      pc.addIceCandidate(candidate);
+      if(username !== data['from_user']) {
+        var candidate = new RTCIceCandidate({
+          sdpMLineIndex: message.label,
+          candidate: message.candidate
+        });
+        pc.addIceCandidate(candidate);
+      }
     } else if (message === 'bye' && isStarted) {
       handleRemoteHangup();
     } else if (message === "create_or_join") {
@@ -133,6 +135,7 @@ window.onbeforeunload = function() {
 
 function createPeerConnection() {
   try {
+    console.log("trying to create peer connection")
     pc = new RTCPeerConnection(pcConfig);
     pc.onicecandidate = handleIceCandidate;
     pc.onaddstream = handleRemoteStreamAdded;
@@ -146,7 +149,9 @@ function createPeerConnection() {
 }
 
 function handleIceCandidate(event) {
+  console.log("trying to send candidate")
   if (event.candidate) {
+    console.log("sending candidate")
     sendMessage({
       type: 'candidate',
       label: event.candidate.sdpMLineIndex,
