@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 SITE_ID=1
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -133,4 +134,4 @@ ASGI_APPLICATION = 'facebock.routing.application'
 
 AUTH_USER_MODEL = 'chat.User'
 
-APPEND_SLASH=False
+APPEND_SLASH=True
