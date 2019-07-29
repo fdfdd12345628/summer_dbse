@@ -24,7 +24,7 @@ class UserBehavior(TaskSet):
 
     @task(2)
     def index(self):
-        self.client.get("/cart/")
+        self.client.get("")
 
     # @task(1)
     def profile(self):

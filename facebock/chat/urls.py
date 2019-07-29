@@ -5,7 +5,8 @@ from .views import webauthn_begin_activate,webauthn_begin_assertion,verify_crede
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-    url(r'^(?P<room_name>[^/]+)/$', views.room, name='room'),
+    path("chat/", views.room, name='room'),
+    path("rtc/", views.rtc, name='rtc'),
     path("webauthn_begin_activate", webauthn_begin_activate),
     path("webauthn_begin_assertion", webauthn_begin_assertion),
     path("verify_credential_info", verify_credential_info),
