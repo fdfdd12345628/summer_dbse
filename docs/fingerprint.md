@@ -1,6 +1,6 @@
-#Webauthn
+# Webauthn
 
-###STEP 1  
+### STEP 1  
 在views.py中加入: (RP_ID , ORIGIN 依據架設環境改變)
 
     import facebock.webauthn as webauthn
@@ -8,7 +8,7 @@
     ORIGIN = 'http://localhost:8000'
     TRUST_ANCHOR_DIR = 'trusted_attestation_roots'
 ##
-###STEP2
+### STEP2
 可選擇 (1)或者(2)  
 (1)在html中設定button
      
@@ -41,12 +41,15 @@
 * login 需有 username  
 
 ##
-###DEMO  Usage
+### DEMO  Usage
 
 開啟server後 進入 <localhost:8000>
-#####Register
+##### Register
 輸入Username 和 Display Name後 按下 *Register with WebAuthn*  
 驗證成功後會創建新的user
-#####Login
+##### Login
 輸入以webauthn創建的username 按下 *Log in with WebAuthn*
 驗證成功後登入系統
+
+##  
+[channel 參考資料](https://channels.readthedocs.io/en/latest/)

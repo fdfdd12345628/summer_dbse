@@ -6,6 +6,7 @@
 	<title>Chat Room</title>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 	<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 	{% load static %}
 	<link  rel="stylesheet" href="{% static 'room.css'%}">
@@ -104,9 +105,9 @@
 /******
 關於 ws的前端
 ******/
-    var roomName = {{ room_name_json }};
+    var roomName = "{{ room_name_json }}";
     var chatSocket = new WebSocket(
-        'ws://' + window.location.host +
+        'wss://' + window.location.host +
         '/ws/chat/' + roomName + '/');
 
 /******
@@ -138,7 +139,7 @@
 				if($("#display_room_"+group_name).length){
             			$("#display_room_"+group_name).find(".msg_card_body").append(data['from_user']+" : "+message + "<br/>");
 				}else{
-                   	 	$("#ChatRoom_Position").append('<div class="col-md-6 col-xl-6 chat" id="display_room_'+group_name+'"><div class="card"><div class="card-header msg_head"><div class="d-flex bd-highlight"><div class="img_cont"><img src="https://image.flaticon.com/icons/svg/784/784662.svg" class="rounded-circle user_img"><span class="online_icon"></span></div><div class="user_info"><span>'+display_name+'</span></div></div></div><div class="card-body msg_card_body"></div><div class="card-footer"><div class="input-group"><div class="input-group-append"><span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span></div><textarea name="" class="form-control type_msg" placeholder="Type your message..."></textarea><div class="input-group-append"><span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span></div></div></div></div></div>')
+                   	 	$("#ChatRoom_Position").append('<div class="col-md-6 col-xl-6 chat" id="display_room_'+group_name+'"><div class="card"><i class="chatroom_close material-icons">close</i><div class="card-header msg_head"><div class="d-flex bd-highlight"><div class="img_cont"><img src="https://image.flaticon.com/icons/svg/784/784662.svg" class="rounded-circle user_img"><span class="online_icon"></span></div><div class="user_info"><span>'+display_name+'</span></div></div></div><div class="card-body msg_card_body"></div><div class="card-footer"><div class="input-group"><div class="input-group-append"><span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span></div><textarea name="" class="form-control type_msg" placeholder="Type your message..."></textarea><div class="input-group-append"><span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span></div></div></div></div></div>')
             			$("#display_room_"+group_name).find(".msg_card_body").append(data['from_user']+" : "+message + "<br/>");
 				}
 			}

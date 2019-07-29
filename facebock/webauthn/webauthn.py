@@ -219,7 +219,6 @@ class WebAuthnAssertionOptions(object):
             acceptable_credentials.append({
                 'type': 'public-key',
                 'id': user.credential_id,
-                
             })
 #'transports': ['usb', 'nfc', 'ble', 'internal'],
         assertion_dict = {
