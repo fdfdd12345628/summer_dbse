@@ -109,6 +109,24 @@ from django.contrib.auth.models import User
       ...
 	}
 
+## 安裝redis
+redis是聊天的核心之一，開啟最簡單的方式為
+```shell script
+docker run -p 6379:6379 -d redis
+```
+若是6379已被占用，也可以更改，記得在 `settings.py` 中修改
+```python
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            # change host and port here
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
+```
+
 ## 使用uvicorn開啟django
 
 切換到project的根目錄，執行uvicorn
