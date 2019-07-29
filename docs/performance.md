@@ -18,10 +18,12 @@ mysql比sqlite好(防止資料庫鎖定問題)
 ## websocket test(using uvicorn)
 ####每秒能處理的訊息
 在不同執行序下，每種配置所能處理的websocket訊息上限
-* 1 django, 1 mysql: 97 requests per second
-* 1 django, 4 mysql: 95 requests per second
-* 4 django, 1 mysql: 232 requests per second
-* 4 django, 4 mysql: 235 requests per second
+* 1 django, 1 mysql: 175 requests per second
+* 1 django, 2 mysql: 170 requests per second
+* 2 django, 1 mysql: 240 requests per second
+* 2 django, 2 mysql: 227 requests per second
+* 4 django, 1 mysql: 255 requests per second
+* 4 django, 2 mysql: 250 requests per second
 
 在我們測試的情境下，mysql的cpu使用率都沒有超過70%過  
 幾乎都是python把系統資源吃完
