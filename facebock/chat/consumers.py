@@ -38,7 +38,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Leave room group
         # remove user from layer
         await self.channel_layer.group_discard(
-            self.user_name,
+            str(self.user_name),
             self.channel_name,
         )
         # clear relation between user and websocket
