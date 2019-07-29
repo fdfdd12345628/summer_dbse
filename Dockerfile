@@ -1,4 +1,5 @@
 FROM alpine
+COPY . ./app
 RUN echo "**** install gcc & dependency****" && \
     apk add --no-cache make build-base gcc libffi-dev openssl-dev bash && \
     echo "**** install Python ****" && \
@@ -14,7 +15,6 @@ RUN echo "**** install gcc & dependency****" && \
     cd /app/facebock && \
     python3 manage.py migrate
 # CMD echo "done!!"
-COPY . ./app
 RUN wget http://download.redis.io/releases/redis-5.0.5.tar.gz && \
     tar xzf redis-5.0.5.tar.gz && \
     cd redis-5.0.5 && \
