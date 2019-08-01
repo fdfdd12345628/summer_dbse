@@ -47,6 +47,11 @@ def index(request):
             print("null")
             return HttpResponse(200)
 
+
+def rtc(request):
+    return render(request,"chat/rtc.html")
+
+
 def room(request):
     if request.method == "GET":
         if request.user.is_authenticated:

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    {% load static %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="{% static 'main.css' %}">
+</head>
+<body>
+<video id="main_video" class="second" autoplay muted playsinline></video>
+<video id="second_video" class="main" autoplay playsinline></video>
+<button id="join_button" onclick="join_chat()">JOIN</button>
+
+</body>
+<script>
+    var username = "{{ request.user.username }}"
+    var chatSocket = new WebSocket(
+        'wss://' + window.location.host +
+        '/ws/chat/rtc/');
+    chatSocket.onclose = function (e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+</script>
+<script src="{% static 'main.js' %}"></script>
+</html>
