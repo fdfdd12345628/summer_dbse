@@ -1,0 +1,28 @@
+.main{
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+    z-index: 0;
+}
+.second{
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 5%;
+    min-height: 5%;
+    max-height:25%;
+    z-index: 1;
+}
+#join_button{
+    position: fixed;
+    left:50%;
+    bottom:30%;
+    height:5%;
+    width:10vh;
+    margin-left: -5vh;
+    background: cornflowerblue;
+    color: white;
+    font-size: 2vh;
+}
