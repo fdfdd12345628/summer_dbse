@@ -22,9 +22,9 @@ class UserBehavior(TaskSet):
         self.client.post('/cart/', {'meal': '{"cart_duck_01_honey":1,"cart_duck_01_tomato":1,"cart_duck_01_lemon":1,"cart_beef_01_honey":1,"cart_beef_01_tomato":1,"cart_beef_01_lemon":1,"cart_salmon_01_honey":1,"cart_salmon_01_tomato":1,"cart_salmon_01_lemon":1,"cart_hotdog_01_honey":1,"cart_hotdog_01_tomato":1,"cart_hotdog_01_lemon":1,"cart_greenTea_01":1,"cart_blackTea_01":1,"cart_fish_01":1,"cart_fries_01":1}',
                                    'money': 1430})
 
-    @task(2)
+    @task
     def index(self):
-        self.client.get("/cart/")
+        self.client.get("")
 
     # @task(1)
     def profile(self):

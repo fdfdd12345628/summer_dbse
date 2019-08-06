@@ -6,18 +6,53 @@ import json, os, string, random, sys
 # from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
-import webauthn.webauthn as webauthn
+import webauthn as webauthn
 
 RP_ID = 'localhost'
-ORIGIN = 'http://localhost:8000'
+ORIGIN = 'https://localhost'
 TRUST_ANCHOR_DIR = 'trusted_attestation_roots'
 
 
 def index(request):
-    return render(request, 'chat/index.html', {})
+    if request.method =="GET":
+        return render(request, 'chat/index.html', {})
+    else:
+        if request.POST.get('type','')=='register':
+            username = request.POST.get("username",'')
+            password = request.POST.get("password",'')
+            Re_user=User.objects.filter(username=username)
+            if Re_user.count() == 0:
+                User.objects.create_user(username=username,password =password )
+                return JsonResponse({"message":"註冊成功"})
+            else:
+                return JsonResponse({"message":"錯誤或重複的輸入"})
+        elif request.POST.get('type','')=='login':
+            if request.user.is_authenticated:
+                return  JsonResponse({"message":"already login"})
+            username = request.POST.get("username",'')
+            password = request.POST.get("password",'')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request,user)
+                return JsonResponse({"message":"success login"})
+            else:
+                return JsonResponse({"message":"wrong password or none account"})
+        elif request.POST.get("type",'') =='logout':
+            if request.user.is_authenticated:
+                logout(request)
+                return JsonResponse({"message":"success logout"})
+            else:
+                return JsonResponse({"message":"not login"})
+        else:
+            print("null")
+            return HttpResponse(200)
 
 
-def room(request, room_name):
+def rtc(request):
+    return render(request,"chat/rtc.html")
+
+
+def room(request):
     if request.method == "GET":
         if request.user.is_authenticated:
             userid = request.user.id
@@ -35,7 +70,7 @@ def room(request, room_name):
             All_User = []
             All_Involved_Group = []
         return render(request, 'chat/room.html', {
-            'room_name_json': mark_safe(json.dumps(room_name)),
+            'room_name_json': 'chat',
             'All_Notification': All_Notification,
             'All_User': All_User,
             'Self_User': owner,
@@ -76,7 +111,13 @@ def room(request, room_name):
                 content["id"] = Redundant_Group.first().id
                 content["display_name"] = Redundant_Group.first().display_name
                 return HttpResponse(json.dumps(content))
-
+        elif request.POST.get("type","") =="getRoomMessage":
+            groupId = request.POST.get("groupId")
+            messageNum = int(request.POST.get("messageNum"))
+            returnMessageObjectList = Message.objects.filter(to_group_id = groupId).order_by('-id')[messageNum:messageNum+9]
+            print(messageNum)
+            returnMessage = [{"content":ele.content, "date":ele.date, "fromUser": True if ele.from_user_id == request.user.id else False} for ele in returnMessageObjectList]
+            return JsonResponse({"returnMessage": returnMessage})
 
 # Create your views here.
 
