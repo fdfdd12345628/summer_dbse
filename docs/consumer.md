@@ -1,3 +1,13 @@
+# websocket 連線架構
+1. 前端發出連線需求  
+2. 後端由 `routing.py` 內定義的url判斷進入哪個 `consumer.py ` 
+3. 由 `consumer.py` 的 `connect()` 進行連線初始化，執行結束後，連線成功  
+4. 前後連線成功後，前端會看到 `101 switching protocol` ，後端看到 `WSCONNECT /ws/chat/chat/`  
+5. 前端傳送訊息給後端，由後端的 `connsumer.py` 中 `receive()` 處理訊息
+6. `receive()` 可以用channel_layer與其他的consumer聯絡，其中 `type` 是定義呼叫其他consumer的function名字  
+7. consumer藉由 `send()` 來送訊息到前端
+8. 當任何一方段開連線後，後端會呼叫 `dissconnect()` 來清除連線狀態
+
 # Consumer.py程式解釋
 
 ## channel_layer解釋

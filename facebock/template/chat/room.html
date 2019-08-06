@@ -108,7 +108,7 @@
     var roomName = "{{ room_name_json }}";
     var chatSocket = new WebSocket(
         'wss://' + window.location.host +
-        '/ws/chat/' + roomName + '/');
+        '/websocket/chat/' + roomName + '/');
 
 /******
 當訊息進入前端 進入 onmessage
