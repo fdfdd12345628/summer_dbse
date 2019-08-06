@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'chat',
+    'webauthn',
+
 ]
 SITE_ID=1
 MIDDLEWARE = [
