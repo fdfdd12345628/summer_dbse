@@ -3,6 +3,7 @@
 <html>
 <head>
 	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Chat Room</title>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
@@ -13,191 +14,194 @@
 	<script src="{% static 'room.js' %}"></script>
 </head>
 <body>
-<div class="container-fluid h-100">
-	<div class="row justify-content-center h-100">
-		<div class="col-md-6 col-xl-6">
-			<div class="row">
-				<div class="col-md-4 col-xl-6 chat">
-					<div class="card mb-sm-3 mb-md-0 contacts_card">
-						<div class="card-header">
-							<div class="input-group">
-								<input type="text" placeholder="Search..." name="" class="form-control search">
-								<div class="input-group-prepend">
-									<span class="input-group-text search_btn"><i class="fas fa-search"></i></span>
-								</div>
-							</div>
-						</div>
-						<div class="card-body contacts_body">
-							<ui class="contacts">
-								<li class="active">
-									<div class="d-flex bd-highlight">
-										<div class="img_cont">
-											<img src="https://image.flaticon.com/icons/svg/188/188987.svg" class="rounded-circle user_img">
-											<span class="online_icon"></span>
-										</div>
-										<div class="user_info">
-											<span>{{ Self_User.username }}</span>
-										</div>
-									</div>
-								</li>
-								<nav class="navbar navbar-expand-md bg-dark navbar-dark"></nav>
-								{% for room in Existed_Group %}
-								<li class="exist_room" id="room_{{ room.id }}">
-									<div class="d-flex bd-highlight">
-										<div class="img_cont">
-											<img src="https://image.flaticon.com/icons/svg/784/784662.svg" class="rounded-circle user_img">
-											<span class="online_icon offline"></span>
-										</div>
-										<div class="user_info">
-											<span>{{ room.display_name }}</span>
-										</div>
-									</div>
-								</li>
-                                {% endfor %}
-								<nav class="navbar navbar-expand-md bg-dark navbar-dark"></nav>
-								{% for user in All_User %}
-								<li class="other_user" id="user_{{ user.id }}">
-									<div class="d-flex bd-highlight">
-										<div class="img_cont">
-											<img src="https://image.flaticon.com/icons/svg/252/252912.svg" class="rounded-circle user_img">
-											<span class="online_icon offline"></span>
-										</div>
-										<div class="user_info">
-											<span>{{ user.username }}</span>
-										</div>
-									</div>
-								</li>
-								{% endfor %}
-							</ui>
-						</div>
-						<div class="card-footer"></div>
-					</div>
-				</div>
-				<div class="col-md-4 col-xl-6 chat">
-					<textarea id="chat-log" cols="23" rows="5"></textarea><br/>
-					<input id="chat-message-input" type="text" size="20" placeholder="chat_message"/><br/>
-					<input id="user-input" type="text" size="20" placeholder="user_name"/><br/>
-					<input id="chat-message-submit" type="button" value="chat"/>
-					<input id="notification-message-submit" type="button" value="notification"/>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-6 col-xl-6">
-			<div class="row" id="ChatRoom_Position">
-			</div>
-		</div>
-		<div id="notification_icon" class="None_Notification">
-			<span class="redpoint" id="notification_redpoint">0</span>
-		</div>
-		<div class="list-group" id="notification_list_group" >
-			{% for ele in All_Notification reversed %}
-			{% if ele.seen %}
-			<a href="#" class="list-group-item list-group-item-action" id="notification_{{ele.id}}">{{ele.content}}</a>
-			{% else %}
-			<a href="#" class="list-group-item list-group-item-action list-group-item-primary"id="notification_{{ele.id}}">{{ele.content}}</a>
-			{% endif %}
-			{% endfor %}
-		</div>
+<textarea id="chat-log" cols="23" rows="5"></textarea><br/>
+<input id="chat-message-input" type="text" size="20" placeholder="chat_message"/><br/>
+<input id="user-input" type="text" size="20" placeholder="user_name"/><br/>
+<input id="chat-message-submit" type="button" value="chat"/>
+<input id="notification-message-submit" type="button" value="notification"/>
+
+<div class="chatRoomList">
+    <div class="chatRoomListSelf">
+		<img src="../static/avatar.jpg" alt="none" class="chatRoomListAvatar">
+		<h2>{{Self_User.username}}</h2>
 	</div>
+    <div class="existRoomList">
+		{% for room in Existed_Group %}
+		<div class="singleExistRoom" id="room_{{ room.id }}">
+			<img src="https://image.flaticon.com/icons/svg/784/784662.svg" alt="none">
+            {{ room.display_name }}
+		</div>
+		{% endfor %}
+	</div>
+    <div class="existAllUser">
+		{% for user in All_User %}
+		<div class="singleChatUser" id="user_{{ user.id }}">
+			<img src="https://image.flaticon.com/icons/svg/149/149452.svg" alt="none">
+			{{ user.username }}
+		</div>
+		{% endfor %}
+	</div>
+</div>
+<div class="chatRoomSpace">
+    <!--
+    <div class="chatRoomOverFlow"></div>
+    -->
+    <!--
+	<div class="singleChatRoom unOpenChatRoom">
+		<div class="singleChatRoomHead">
+			<div class="singleChatRoomHeadName">
+				RoomName when overflow
+			</div>
+			<i class="material-icons singleChatRoomClose" >close</i>
+		</div>
+		<div class="singleChatRoomMessageSpace" style="display: block;">
+			<div class="chatRoomMessage">
+                <div class="messageFromSelf">
+					Test Message
+				</div>
+			</div>
+			<div class="chatRoomMessage">
+				<div class="chatRoomAvatarSpace">
+					<img src="../static/avatar.jpg" alt="none" class="chatRoomAvatar">
+				</div>
+				<div class="messageFromOther">
+					Test Message From Other if too long
+				</div>
+
+			</div>
+			<div class="chatRoomMessage">
+                <div class="messageFromSelf">
+					Test Message
+				</div>
+			</div>
+		</div>
+		<textarea class="singleChatRoomText"></textarea>
+		<button class="singleChatRoomTextButton"></button>
+	</div>
+	-->
+</div>
+<div id="notification_icon" class="None_Notification">
+	<span class="redpoint" id="notification_redpoint">0</span>
+</div>
+<div class="list-group" id="notification_list_group" >
+	{% for ele in All_Notification reversed %}
+	{% if ele.seen %}
+	<a href="#" class="list-group-item list-group-item-action" id="notification_{{ele.id}}">{{ele.content}}</a>
+	{% else %}
+	<a href="#" class="list-group-item list-group-item-action list-group-item-primary"id="notification_{{ele.id}}">{{ele.content}}</a>
+	{% endif %}
+	{% endfor %}
 </div>
 </body>
 <script>
-/******
-關於 ws的前端
-******/
-    var roomName = "{{ room_name_json }}";
-    var chatSocket = new WebSocket(
-        'wss://' + window.location.host +
-        '/ws/chat/' + roomName + '/');
+	/******
+	 關於 ws的前端
+	 ******/
+	var roomName = "{{ room_name_json }}";
+	var chatSocket = new WebSocket(
+			'wss://' + window.location.host +
+			'/ws/chat/' + roomName + '/');
 
-/******
-當訊息進入前端 進入 onmessage
-******/
-    chatSocket.onmessage = function (e) {
-        var data = JSON.parse(e.data);
-        var message = data['message'];
-        var type = data['type'];
-        //判斷類別
-        if(type == "notification"){
-       		//新增通知
-       		add_red_point("notification_redpoint");
-        	var notification_id = data["id"]
-        	//加入通知內容
-        	if($("#notification_list_group > a").length){
+	/******
+	 當訊息進入前端 進入 onmessage
+	 ******/
+	chatSocket.onmessage = function (e) {
+		var data = JSON.parse(e.data);
+		var message = data['message'];
+		var type = data['type'];
+		//判斷類別
+		if(type == "notification"){
+			//新增通知
+			add_red_point("notification_redpoint");
+			var notification_id = data["id"]
+			//加入通知內容
+			if($("#notification_list_group > a").length){
 				$('<a href="#" class="list-group-item list-group-item-action list-group-item-primary"id="notification_'+notification_id+'">'+message+'</a>').insertBefore($("#notification_list_group a:first-child"));
-				console.log($("#notification_list_group a:first-child").attr("id"))
 			}else{
 				$("#notification_list_group").append('<a href="#" class="list-group-item list-group-item-action list-group-item-primary"id="notification_'+notification_id+'">'+message+'</a>')
 			}
-        }else if(type == "chat"){
-        	/******確認收到訊息者為接收者 非發送者******/
-        	if(data['from_user'] != "{{ request.user.username }}"){
+		}else if(type == "chat"){
+			/******確認收到訊息者為接收者 非發送者******/
+			if(data['from_user'] != "{{ request.user.username }}"){
 				var group_name = data["group_name"]
 				var display_name = data["display_name"]
-				console.log(group_name)
 				//若聊天室未打開 則append聊天室
 				if($("#display_room_"+group_name).length){
-            			$("#display_room_"+group_name).find(".msg_card_body").append(data['from_user']+" : "+message + "<br/>");
+					$("#display_room_"+group_name).find(".singleChatRoomMessageSpace").append('<div class="chatRoomMessage"><div class="chatRoomAvatarSpace"><img src="../static/avatar.jpg" alt="none" class="chatRoomAvatar"></div><div class="messageFromOther">'+ message +'</div></div>');
+					$("#display_room_"+group_name).find(".singleChatRoomMessageSpace")[0].scrollTop = $("#display_room_"+group_name).find(".singleChatRoomMessageSpace")[0].scrollHeight
 				}else{
-                   	 	$("#ChatRoom_Position").append('<div class="col-md-6 col-xl-6 chat" id="display_room_'+group_name+'"><div class="card"><i class="chatroom_close material-icons">close</i><div class="card-header msg_head"><div class="d-flex bd-highlight"><div class="img_cont"><img src="https://image.flaticon.com/icons/svg/784/784662.svg" class="rounded-circle user_img"><span class="online_icon"></span></div><div class="user_info"><span>'+display_name+'</span></div></div></div><div class="card-body msg_card_body"></div><div class="card-footer"><div class="input-group"><div class="input-group-append"><span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span></div><textarea name="" class="form-control type_msg" placeholder="Type your message..."></textarea><div class="input-group-append"><span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span></div></div></div></div></div>')
-            			$("#display_room_"+group_name).find(".msg_card_body").append(data['from_user']+" : "+message + "<br/>");
+					chatRoomOpenList.push("display_" + this.id)
+					if(chatRoomOpenList.length <4) {
+						$(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" id="display_room_'+group_name+'"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> '+display_name+'</div> <i class="material-icons singleChatRoomClose" style="float: right">close</i> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
+					}else if(chatRoomOpenList.length == 4){
+						$(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" style="display: none" id="display_room_' + group_name + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + display_name + '</div> <i class="material-icons singleChatRoomClose" style="float: right">close</i> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
+						$(".chatRoomSpace").append('<div class="chatRoomOverFlow"></div>')
+					}else{
+						$('<div class="singleChatRoom unOpenChatRoom" style="display: none" id="display_room_' + group_name + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + display_name + '</div> <i class="material-icons singleChatRoomClose" style="float: right">close</i> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>').insertBefore($(".chatRoomOverFlow"))
+					}
+					$("#display_room_"+group_name).find(".singleChatRoomMessageSpace").append('<div class="chatRoomMessage"><div class="chatRoomAvatarSpace"><img src="../static/avatar.jpg" alt="none" class="chatRoomAvatar"></div><div class="messageFromOther">'+ message +'</div></div>');
+					getRoomMessage(group_name)
+					$("#display_room_"+ group_name +" > .singleChatRoomMessageSpace").bindScrollHandler()
+				}
+				if($("#display_room_"+group_name).hasClass("unOpenChatRoom")){
+				    $("#display_room_"+group_name).find(".singleChatRoomHead").addClass("singleChatRoomHeadNotification")
 				}
 			}
-        }
-        //document.querySelector('#chat-log').value += (message + '\n');
-    };
+		}
+		//document.querySelector('#chat-log').value += (message + '\n');
+	};
 
-    chatSocket.onclose = function (e) {
-        console.error('Chat socket closed unexpectedly');
-    };
+	chatSocket.onclose = function (e) {
+		console.error('Chat socket closed unexpectedly');
+	};
 
-    document.querySelector('#chat-message-input').focus();
-    /********
-    initially existed, no use
-    document.querySelector('#chat-message-input').onkeyup = function (e) {
+	document.querySelector('#chat-message-input').focus();
+	/********
+	 initially existed, no use
+	 document.querySelector('#chat-message-input').onkeyup = function (e) {
         if (e.keyCode === 13) {  // enter, return
             document.querySelector('#chat-message-submit').click();
         }
     };
-	*********/
+	 *********/
 
 
-    document.querySelector('#notification-message-submit').onclick = function (e) {
-        var messageInputDom = document.querySelector('#chat-message-input');
-        var message = messageInputDom.value;
-        var user_name = document.querySelector('#user-input').value;
-        chatSocket.send(JSON.stringify({
-            'message': message,
-            'type':'notification',
+	document.querySelector('#notification-message-submit').onclick = function (e) {
+		var messageInputDom = document.querySelector('#chat-message-input');
+		var message = messageInputDom.value;
+		var user_name = document.querySelector('#user-input').value;
+		chatSocket.send(JSON.stringify({
+			'message': message,
+			'type':'notification',
 			'user_name':user_name,
-        }));
-        messageInputDom.value = '';
-    };
-    /******
-    傳送通知
-    Usage:
-        message: 欲傳送訊息
-        type: 判斷ws是通知或是聊天訊息
-        user_name: 判斷ws傳送對象 ( "user" )
-        {因 通知對人 聊天對聊天室}
-    ******/
+		}));
+		messageInputDom.value = '';
+	};
+	/******
+	 傳送通知
+	 Usage:
+	 message: 欲傳送訊息
+	 type: 判斷ws是通知或是聊天訊息
+	 user_name: 判斷ws傳送對象 ( "user" )
+	 {因 通知對人 聊天對聊天室}
+	 ******/
 </script>
 <script>
-/******
-前端load
-******/
+	/******
+	 前端load
+	 ******/
 
 	$(document).ready(function(){
 		{% for ele in All_Notification reversed %}
-			{% if not ele.seen %}
-				add_red_point("notification_redpoint");
-			{% endif %}
-    	{% endfor %}
+		{% if not ele.seen %}
+		add_red_point("notification_redpoint");
+		{% endif %}
+		{% endfor %}
 	})
 	/******
-	將通知數顯示在小紅點
-	{通知內容在html裡加入}
-	******/
+	 將通知數顯示在小紅點
+	 {通知內容在html裡加入}
+	 ******/
 
 
 </script>

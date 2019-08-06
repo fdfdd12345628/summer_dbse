@@ -225,7 +225,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                               content=text,
                               date=datetime.datetime.now(),
                               to_group=group, )
-
             message.save()
         else:
             return
