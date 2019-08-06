@@ -103,7 +103,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         elif cate == 'webrtc':
             rtc_name = text_data_json['rtc_name']
             message = text_data_json['message']
-            print(type(str(self.user)), type(rtc_name))
             await self.channel_layer.group_send(
                 'rtc',
                 {
@@ -166,7 +165,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'type': 'webrtc',
                     'message': message,
                     'create_or_join': "join",
-                    'from_user': event['from_user']
+                    'from_user': event['from_user'],
+                    'active' : len(room_people)
                 }))
         elif message =="bye":
             if self.user.username in room_people:
@@ -225,7 +225,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                               content=text,
                               date=datetime.datetime.now(),
                               to_group=group, )
-
             message.save()
         else:
             return
