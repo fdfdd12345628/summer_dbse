@@ -6,8 +6,10 @@
 5. 前端傳送訊息給後端，由後端的 `connsumer.py` 中 `receive()` 處理訊息
 6. `receive()` 可以用channel_layer與其他的consumer聯絡，其中 `type` 是定義呼叫其他consumer的function名字  
 7. consumer藉由 `send()` 來送訊息到前端
-8. 當任何一方段開連線後，後端會呼叫 `dissconnect()` 來清除連線狀態
+8. 當任何一方段開連線後，後端會呼叫 `dissconnect()` 來清除連線狀態  
 
+以下是websocket連線架構圖
+![websocket](consumer.png)
 # Consumer.py程式解釋
 
 ## channel_layer解釋
