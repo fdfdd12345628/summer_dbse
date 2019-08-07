@@ -1,16 +1,16 @@
 FROM alpine
+COPY requirement.txt ./app/requirement.txt
 RUN echo "**** install gcc & dependency****" && \
     apk add --no-cache make build-base gcc libffi-dev openssl-dev bash && \
     echo "**** install Python ****" && \
     apk add --no-cache python3-dev && \
     # if [ ! -e /usr/bin/python ]; then ln -sf python3 /usr/bin/python ; fi && \
-
     echo "**** install pip ****" && \
     python3 -m ensurepip && \
     rm -r /usr/lib/python*/ensurepip && \
     pip3 install --no-cache --upgrade pip setuptools wheel && \
     # if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi \
-    pip3 install django channels channels-redis cbor2 pyopenssl whitenoise
+    pip3 install -r /app/requirement.txt
 # CMD echo "done!!"
 RUN wget http://download.redis.io/releases/redis-5.0.5.tar.gz && \
     tar xzf redis-5.0.5.tar.gz && \
