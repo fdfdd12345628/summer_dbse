@@ -1,3 +1,4 @@
+[回上一頁](../文件導覽.md) 
 # websocket 連線架構
 1. 前端發出連線需求  
 2. 後端由 `routing.py` 內定義的url判斷進入哪個 `consumer.py ` 
@@ -11,7 +12,9 @@
 以下是websocket連線架構圖
 ![websocket](consumer.png)
 # Consumer.py程式解釋
-
+## 基本概念
+每個websocket在後端都可以看成是consumer的instance，每個instance都有自己獨特的id，但是不同instance只能透過channel_layer溝通，溝通前提是你必須知道對方instance的id或group。   
+因此在websocket連線時，會先將當前User與該websocket的連結儲存進資料庫，日後要傳輸時，可以直接查詢資料庫來確認特定User擁有哪些websocket  
 ## channel_layer解釋
 由於每個websocket之間不互通，因此藉由layer來連結，可以將各個websocket加入group。之後就可以送訊息到指定的websocket或是group。
 
@@ -122,3 +125,5 @@ await self.send(text_data=json.dumps({
 
 ##  
 [channel 參考資料](https://channels.readthedocs.io/en/latest/)
+
+[回上一頁](../文件導覽.md) 
