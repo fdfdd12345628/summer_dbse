@@ -123,14 +123,11 @@ $(function(){
             },
             dataType: 'json',
             success: function(content){
-                console.log("success");
-                console.log(content["id"])
                 if($("#display_room_" + content["id"] ).length == 0) {
                     chatRoomOpenList.push("display_room_" + content["id"])
                     if(chatRoomOpenList.length <4) {
                         $(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" id="display_room_' + content["id"] + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + content["display_name"] + '</div> <i class="material-icons singleChatRoomClose" style="float: right">close</i> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
                     }else if(chatRoomOpenList.length === 4){
-                        console.log("over ")
                         $(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" style="display: none" id="display_room_' + content["id"] + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + content["display_name"] + '</div> <i class="material-icons singleChatRoomClose" style="float: right">close</i> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
                         $(".chatRoomSpace").append('<div class="chatRoomOverFlow"></div>')
                     }else{
@@ -138,10 +135,6 @@ $(function(){
                     }
                     getRoomMessage(content["id"])
                     $("#display_room_"+ content["id"] +" > .singleChatRoomMessageSpace").bindScrollHandler()
-                    setTimeout(function () {
-                        //$("#display_room_"+content["id"]).find(".singleChatRoomMessageSpace")[0].scrollTop = $("#display_room_"+content["id"]).find(".singleChatRoomMessageSpace")[0].scrollHeight
-                    },50)
-                    console.log("loading over")
                 }
             },
         })
@@ -248,6 +241,8 @@ $(function () {
             }
         }
     })
+
+    // 按esc離開聊天視窗
     $(document).on("keyup",".singleChatRoomText",function (e) {
         if(e.key === "Escape"){
             $(this).parent().remove()
@@ -261,6 +256,8 @@ $(function () {
         }
     })
 
+    //設定dynamic element 可以使用scroll event
+    //拉到頂部讀取更舊訊息
     $.fn.bindScrollHandler = function(){
         $(this).on('scroll', function(){
             if($(this).scrollTop() <=0){
@@ -269,6 +266,7 @@ $(function () {
         });
     }
 })
+//聊天室訊息讀取
 function getRoomMessage(groupId) {
     var originRoomHeight = $("#display_room_"+groupId).find(".singleChatRoomMessageSpace")[0].scrollHeight
     setTimeout(function () {
@@ -287,6 +285,7 @@ function getRoomMessage(groupId) {
                     $("#display_room_"+groupId+" > .singleChatRoomMessageSpace > .chatRoomLoadMessage").remove()
                     content["returnMessage"].forEach(function (ele) {
                         if(ele.fromUser){
+                            //訊息屬於自己
                             if($("#display_room_"+groupId).find(".chatRoomMessage").length == 0 ){
                                 $("#display_room_"+groupId).find(".singleChatRoomMessageSpace").append('<div class="chatRoomMessage"><div class="messageFromSelf">' + ele.content +'</div></div>')
                             }else{
@@ -302,6 +301,7 @@ function getRoomMessage(groupId) {
                         }
                     })
                     setTimeout(function () {
+                        //過往訊息讀取完畢
                         if(content["returnMessage"].length == 9){
                             $('<div class="chatRoomLoadMessage"></div>').insertBefore($("#display_room_"+ groupId+" .chatRoomMessage:first-child"));
                         }
@@ -315,3 +315,13 @@ function getRoomMessage(groupId) {
 
 }
 
+/******
+ * < 設定scroll位置 >
+ * $(ele).find(".singleChatRoomMessageSpace")[0].scrollTop = $(ele).find(".singleChatRoomMessageSpace")[0].scrollHeight
+ *
+ * < 插入content >
+ * $(content).insertBefore(插入ele)
+ *
+ * < 確認是否存在（被創建） >
+ * $(parent).find(id).length == 0
+ ******/

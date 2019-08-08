@@ -323,5 +323,6 @@ function stop() {
   console.log("isInitiator",isInitiator)
   pcList[roomPeer.indexOf(connectingName)].close();
   pcList[roomPeer.indexOf(connectingName)] = null;
+  startConnection[roomPeer.indexOf(connectingName)]=""
   roomPeer[roomPeer.indexOf(connectingName)] = ""
 }
