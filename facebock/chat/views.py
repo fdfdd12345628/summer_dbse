@@ -14,42 +14,45 @@ TRUST_ANCHOR_DIR = 'trusted_attestation_roots'
 
 
 def index(request):
-    if request.method =="GET":
+    if request.method == "GET":
         return render(request, 'chat/index.html', {})
     else:
-        if request.POST.get('type','')=='register':
-            username = request.POST.get("username",'')
-            password = request.POST.get("password",'')
-            Re_user=User.objects.filter(username=username)
+        if request.POST.get('type', '') == 'register':
+            username = request.POST.get("username", '')
+            password = request.POST.get("password", '')
+            Re_user = User.objects.filter(username=username)
             if Re_user.count() == 0:
-                User.objects.create_user(username=username,password =password )
-                return JsonResponse({"message":"註冊成功"})
+                User.objects.create_user(username=username, password=password)
+                return JsonResponse({"message": "註冊成功"})
             else:
-                return JsonResponse({"message":"錯誤或重複的輸入"})
-        elif request.POST.get('type','')=='login':
+                return JsonResponse({"message": "錯誤或重複的輸入"})
+        elif request.POST.get('type', '') == 'login':
             if request.user.is_authenticated:
-                return  JsonResponse({"message":"already login"})
-            username = request.POST.get("username",'')
-            password = request.POST.get("password",'')
+                return JsonResponse({"message": "already login"})
+            username = request.POST.get("username", '')
+            password = request.POST.get("password", '')
             user = authenticate(request, username=username, password=password)
             if user is not None:
-                login(request,user)
-                return JsonResponse({"message":"success login"})
+                login(request, user)
+                return JsonResponse({"message": "success login"})
             else:
-                return JsonResponse({"message":"wrong password or none account"})
-        elif request.POST.get("type",'') =='logout':
+                return JsonResponse({"message": "wrong password or none account"})
+        elif request.POST.get("type", '') == 'logout':
             if request.user.is_authenticated:
                 logout(request)
-                return JsonResponse({"message":"success logout"})
+                return JsonResponse({"message": "success logout"})
             else:
-                return JsonResponse({"message":"not login"})
+                return JsonResponse({"message": "not login"})
         else:
             print("null")
             return HttpResponse(200)
 
 
-def rtc(request):
-    return render(request,"chat/rtc.html")
+def rtc(request, room_name):
+    return render(request, "chat/rtc.html", {
+        'request': request,
+        'room_name': room_name,
+    })
 
 
 def room(request):
@@ -111,14 +114,18 @@ def room(request):
                 content["id"] = Redundant_Group.first().id
                 content["display_name"] = Redundant_Group.first().display_name
                 return HttpResponse(json.dumps(content))
-        elif request.POST.get("type","") =="getRoomMessage":
+        elif request.POST.get("type", "") == "getRoomMessage":
             groupId = request.POST.get("groupId")
             messageNum = int(request.POST.get("messageNum"))
             # [messageNum:messageNum+9] => 一次讀取9條訊息
-            returnMessageObjectList = Message.objects.filter(to_group_id = groupId).order_by('-id')[messageNum:messageNum+9]
+            returnMessageObjectList = Message.objects.filter(to_group_id=groupId).order_by('-id')[
+                                      messageNum:messageNum + 9]
             print(messageNum)
-            returnMessage = [{"content":ele.content, "date":ele.date, "fromUser": True if ele.from_user_id == request.user.id else False} for ele in returnMessageObjectList]
+            returnMessage = [{"content": ele.content, "date": ele.date,
+                              "fromUser": True if ele.from_user_id == request.user.id else False} for ele in
+                             returnMessageObjectList]
             return JsonResponse({"returnMessage": returnMessage})
+
 
 # Create your views here.
 

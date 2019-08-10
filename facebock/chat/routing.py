@@ -1,8 +1,10 @@
 from django.conf.urls import url
 from channels.staticfiles import *
+from django.urls import path
 from . import consumers
 
 websocket_urlpatterns = [
-    url(r'^ws/chat/(?P<room_name>[^/]+)/$', consumers.ChatConsumer),
+    path('websocket/chat/<room_name>/', consumers.ChatConsumer),
+    path('websocket/rtc/<room_name>', consumers.ChatConsumer)
 ]
 

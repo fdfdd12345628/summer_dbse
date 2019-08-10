@@ -19,7 +19,7 @@
     var username = "{{ request.user.username }}"
     var chatSocket = new WebSocket(
         'wss://' + window.location.host +
-        '/ws/chat/rtc/');
+        '/websocket/rtc/{{ room_name }}');
     chatSocket.onclose = function (e) {
         console.error('Chat socket closed unexpectedly');
     };
