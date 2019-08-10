@@ -114,6 +114,7 @@ def room(request):
         elif request.POST.get("type","") =="getRoomMessage":
             groupId = request.POST.get("groupId")
             messageNum = int(request.POST.get("messageNum"))
+            # [messageNum:messageNum+9] => 一次讀取9條訊息
             returnMessageObjectList = Message.objects.filter(to_group_id = groupId).order_by('-id')[messageNum:messageNum+9]
             print(messageNum)
             returnMessage = [{"content":ele.content, "date":ele.date, "fromUser": True if ele.from_user_id == request.user.id else False} for ele in returnMessageObjectList]

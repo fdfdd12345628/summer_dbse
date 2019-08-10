@@ -17,6 +17,7 @@ var pcConfig = {
 var roomPeer = []
 var pc0,pc1,pc2,pc3,pc4,pc5,pc6,pc7,pc8,pc9
 var pcList =[pc0,pc1,pc2,pc3,pc4,pc5,pc6,pc7,pc8,pc9]
+var offerName = []
 var connectingName
 var startConnection=[]
 // Set up audio and video regardless of what devices are present.
@@ -28,7 +29,7 @@ var sdpConstraints = {
 // setup send function
 // rtc_name : undefined
 function sendMessage(message) {
-  console.log('Client sending message: ', message);
+  //console.log('Client sending message: ', message);
   chatSocket.send(JSON.stringify({
             'message': message,
             'type':'webrtc',
@@ -41,7 +42,7 @@ function sendMessage(message) {
 chatSocket.onmessage = function(e) {
   var data = JSON.parse(e.data);
     var message = data['message'];
-    //console.log('Client received message:', data);
+    console.log('Client received message:', data);
     if (message === 'got user media') {
       //maybeStart();
       console.log("receive got user media : "+ data['from_user'])
@@ -84,6 +85,7 @@ chatSocket.onmessage = function(e) {
         connectingName = data['from_user']
         var tmpSessionDes = new RTCSessionDescription(message)
         pcList[roomPeer.indexOf(data['from_user'])].setRemoteDescription(tmpSessionDes);
+        maybeStart()
       }
     //} else if (message.type === 'candidate' && isStarted && clickedJoin) {
     } else if (message.type === 'candidate' && clickedJoin) {
@@ -96,6 +98,8 @@ chatSocket.onmessage = function(e) {
         connectingName = data['from_user']
         pcList[roomPeer.indexOf(data['from_user'])].addIceCandidate(candidate);
 
+      }else{
+        console.log(">>>>>>>>>>>jump")
       }
     //} else if (message === 'bye' && isStarted && clickedJoin) {
     } else if (message === 'bye' && clickedJoin) {
@@ -111,6 +115,9 @@ chatSocket.onmessage = function(e) {
       } else {
         isChannelReady = true
         maybeStart()
+      }
+      if(data["active"] >2 && data["from_user"] != username){
+        isInitiator = true
       }
     }
 };
@@ -212,7 +219,7 @@ function createPeerConnection() {
 
 function handleIceCandidate(event) {
   console.log("trying to send candidate")
-  if (event.candidate) {
+  if (event.candidate && startConnection.indexOf(connectingName)<0) {
     console.log("sending candidate")
     sendMessage({
       type: 'candidate',
@@ -231,8 +238,8 @@ function handleCreateOfferError(event) {
 
 function doCall() {
   console.log('Sending offer to peer');
+  console.log("switching to "+ connectingName)
   pcList[roomPeer.indexOf(connectingName)].createOffer(setLocalAndSendMessage, handleCreateOfferError);
-  startConnection.push(connectingName)
 }
 
 function doAnswer() {
@@ -285,6 +292,7 @@ function requestTurn(turnURL) {
 function handleRemoteStreamAdded(event) {
   console.log('Remote stream added.');
   remoteStream = event.stream;
+  startConnection.push(connectingName)
   if(connectNum == 0){
     remoteVideo.srcObject = remoteStream;
     connectNum +=1
@@ -315,5 +323,6 @@ function stop() {
   console.log("isInitiator",isInitiator)
   pcList[roomPeer.indexOf(connectingName)].close();
   pcList[roomPeer.indexOf(connectingName)] = null;
+  startConnection[roomPeer.indexOf(connectingName)]=""
   roomPeer[roomPeer.indexOf(connectingName)] = ""
 }
