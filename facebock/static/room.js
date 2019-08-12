@@ -373,7 +373,6 @@ function getRoomMessage(groupId) {
  * $(parent).find(id).length == 0
  ******/
 Notification.requestPermission()
-
 function notify(message) {
     // Let's check if the browser supports notifications
     if (!("Notification" in window)) {
