@@ -32,7 +32,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.channel_name,
         )
         await self.channel_layer.group_add(
-            'rtc',
+            self.room_name,
             self.channel_name,
         )
 
@@ -56,29 +56,42 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if cate == 'chat':
             # groupname = '1'  # text_data_json['groupname']
             groupname = text_data_json['groupname']
-            message = text_data_json['message']
             # get all user's layer in that group
             print(groupname)
             total_channel = await self.get_all_user_layer(group_name=groupname)
-            # save to database
-            message_model=await self.put_message(
-                group_id=groupname,
-                from_user=self.user,
-                text=message,
-            )
-            # send to all websocket
-            for channel in total_channel:
-                await self.channel_layer.send(
-                    channel,
-                    {
-                        'type': 'chat_message',
-                        'message': message,
-                        'cate': cate,
-                        # 'user': User.objects.all(),
-                        'group_name': groupname,
-                        'from_user': self.user.id
-                    }
+            if text_data_json['chatType'] == 'text':
+                message = text_data_json['message']
+                # save to database
+                message_model = await self.put_message(
+                    group_id=groupname,
+                    from_user=self.user,
+                    text=message,
                 )
+                # send to all websocket
+                for channel in total_channel:
+                    await self.channel_layer.send(
+                        channel,
+                        {
+                            'type': 'chat_message',
+                            'message': message,
+                            'cate': cate,
+                            # 'user': User.objects.all(),
+                            'group_name': groupname,
+                            'from_user': self.user.id
+                        }
+                    )
+            elif text_data_json['chatType'] == 'videoAsk':
+                for channel in total_channel:
+                    await self.channel_layer.send(
+                        channel,
+                        {
+                            'type': 'videoAsk',
+                            'cate': 'videoAsk',
+                            'group_name': groupname,
+                            'videoChat': text_data_json["videoChat"],
+                            'from_user': self.user.id
+                        }
+                    )
 
         # send notification to target user
         elif cate == 'notification':
@@ -104,7 +117,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             rtc_name = text_data_json['rtc_name']
             message = text_data_json['message']
             await self.channel_layer.group_send(
-                'rtc',
+                self.room_name,
                 {
                     'type': 'webrtc',
                     'message': message,
@@ -129,6 +142,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'date': now.__str__()
         }))
 
+    async def videoAsk(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'videoAsk',
+            'group_name': event['group_name'],
+            'videoChat': event['videoChat'],
+            'from_user': (await self.get_user(event['from_user'])).username
+        }))
+
+
     async def notification_message(self, event):
         message = event['message']
         cate = event['cate']
@@ -143,7 +165,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'id': event['id'],
             }))
 
-    async def webrtc(self,event):
+    async def webrtc(self, event):
         message = event['message']
         global room_people
         if message == "create_or_join":
@@ -157,33 +179,41 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'create_or_join': "create",
                     'from_user': event['from_user']
                 }))
-            elif len(room_people) !=0:
+            elif len(room_people) != 0:
                 if event['from_user'] not in room_people:
                     room_people.append(event['from_user'])
                 print(room_people)
-                await self.send(text_data=json.dumps({
-                    'type': 'webrtc',
-                    'message': message,
-                    'create_or_join': "join",
-                    'from_user': event['from_user'],
-                    'active' : len(room_people)
-                }))
-        elif message =="bye":
-            if self.user.username in room_people:
-                room_people.remove(self.user.username)
-                print("removing ",self.user.username)
+                if (len(room_people) == 1) and (room_people[0] == event['from_user']):
+                    await self.send(text_data=json.dumps({
+                        'type': 'webrtc',
+                        'message': message,
+                        'create_or_join': "create",
+                        'from_user': event['from_user']
+                    }))
+                else:
+                    await self.send(text_data=json.dumps({
+                        'type': 'webrtc',
+                        'message': message,
+                        'create_or_join': "join",
+                        'from_user': event['from_user']
+                    }))
+        elif message == "bye":
+            if event['from_user'] in room_people:
+                room_people.remove(event['from_user'])
+                print("removing ", self.user.username)
                 print("removed, now:", room_people)
                 await self.send(text_data=json.dumps({
                     'type': 'webrtc',
                     'message': message,
-                    'from_user': event['from_user'],
+                    'from_user': event['from_user']
                 }))
         else:
             await self.send(text_data=json.dumps({
                 'type': 'webrtc',
                 'message': message,
-                'from_user': event['from_user'],
+                'from_user': event['from_user']
             }))
+
     @database_sync_to_async
     def get_notification(self, notification_id):
         return Notification.objects.get(pk=notification_id)
@@ -252,3 +282,4 @@ class ChatConsumer(AsyncWebsocketConsumer):
         group = Group.objects.get(pk=group_name)
         all_layer = Clients.objects.filter(user__in=[each for each in group.user.all()])
         return [layer.layer for layer in all_layer]
+

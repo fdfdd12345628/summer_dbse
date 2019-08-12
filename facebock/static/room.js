@@ -126,12 +126,12 @@ $(function(){
                 if($("#display_room_" + content["id"] ).length == 0) {
                     chatRoomOpenList.push("display_room_" + content["id"])
                     if(chatRoomOpenList.length <4) {
-                        $(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" id="display_room_' + content["id"] + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + content["display_name"] + '</div> <i class="material-icons singleChatRoomClose" style="float: right">close</i> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
+                        $(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" id="display_room_' + content["id"] + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + content["display_name"] + '</div> <div class="singleChatRoomIconSpace"><i class="material-icons singleChatRoomVideoCam">videocam</i><i class="material-icons singleChatRoomClose" >close</i></div> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
                     }else if(chatRoomOpenList.length === 4){
-                        $(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" style="display: none" id="display_room_' + content["id"] + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + content["display_name"] + '</div> <i class="material-icons singleChatRoomClose" style="float: right">close</i> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
+                        $(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" style="display: none" id="display_room_' + content["id"] + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + content["display_name"] + '</div> <div class="singleChatRoomIconSpace"><i class="material-icons singleChatRoomVideoCam">videocam</i><i class="material-icons singleChatRoomClose" >close</i></div> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
                         $(".chatRoomSpace").append('<div class="chatRoomOverFlow"></div>')
                     }else{
-                        $('<div class="singleChatRoom unOpenChatRoom" style="display: none" id="display_room_' + content["id"] + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + content["display_name"] + '</div> <i class="material-icons singleChatRoomClose" style="float: right">close</i> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>').insertBefore($(".chatRoomOverFlow"))
+                        $('<div class="singleChatRoom unOpenChatRoom" style="display: none" id="display_room_' + content["id"] + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + content["display_name"] + '</div> <div class="singleChatRoomIconSpace"><i class="material-icons singleChatRoomVideoCam">videocam</i><i class="material-icons singleChatRoomClose" >close</i></div></div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>').insertBefore($(".chatRoomOverFlow"))
                     }
                     getRoomMessage(content["id"])
                     $("#display_room_"+ content["id"] +" > .singleChatRoomMessageSpace").bindScrollHandler()
@@ -157,13 +157,13 @@ $(function(){
         if($("#display_" + this.id ).length == 0) {
             chatRoomOpenList.push("display_" + this.id)
             if(chatRoomOpenList.length <4) {
-                $(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" id="display_' + this.id + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + $(this).text().replace(/\s/g, "") + '</div><i class="material-icons singleChatRoomClose" style="float: right">close</i> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
+                $(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" id="display_' + this.id + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + $(this).text().replace(/\s/g, "") + '</div><div class="singleChatRoomIconSpace"><i class="material-icons singleChatRoomVideoCam">videocam</i><i class="material-icons singleChatRoomClose" >close</i></div> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
             }else if(chatRoomOpenList.length == 4){
                 console.log("over")
-                $(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" style="display: none" id="display_' + this.id + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + $(this).text().replace(/\s/g, "") + '</div> <i class="material-icons singleChatRoomClose" style="float: right">close</i> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
+                $(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" style="display: none" id="display_' + this.id + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + $(this).text().replace(/\s/g, "") + '</div> <div class="singleChatRoomIconSpace"><i class="material-icons singleChatRoomVideoCam">videocam</i><i class="material-icons singleChatRoomClose" >close</i></div></div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
                 $(".chatRoomSpace").append('<div class="chatRoomOverFlow"></div>')
             }else{
-                $('<div class="singleChatRoom unOpenChatRoom" style="display: none" id="display_' + this.id + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + $(this).text().replace(/\s/g, "") + '</div> <i class="material-icons singleChatRoomClose" style="float: right">close</i> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>').insertBefore($(".chatRoomOverFlow"))
+                $('<div class="singleChatRoom unOpenChatRoom" style="display: none" id="display_' + this.id + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + $(this).text().replace(/\s/g, "") + '</div><div class="singleChatRoomIconSpace"><i class="material-icons singleChatRoomVideoCam">videocam</i><i class="material-icons singleChatRoomClose" >close</i></div> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>').insertBefore($(".chatRoomOverFlow"))
             }
             getRoomMessage(this.id.split("room_")[1])
             $("#display_"+ this.id +" > .singleChatRoomMessageSpace").bindScrollHandler()
@@ -192,6 +192,7 @@ $(function(){
                 chatSocket.send(JSON.stringify({
                     'message': $(this).val(),
                     'type': 'chat',
+                    'chatType': 'text',
                     'groupname': $(this).parent().attr("id").split("display_room_")[1],
                 }));
                 $(this).parent().find(".singleChatRoomMessageSpace")[0].scrollTop = $(this).parent().find(".singleChatRoomMessageSpace")[0].scrollHeight
@@ -220,6 +221,7 @@ $(function () {
             $(this).parent().find(".singleChatRoomMessageSpace").css("display","block")
             $(this).parent().find(".singleChatRoomText").css("display","block")
             $(this).parent().find(".singleChatRoomTextButton").css("display","block")
+            $(this).parent().find(".singleChatRoomVideoCam").css("display", "inline-block")
             $(this).removeClass("singleChatRoomHeadNotification")
             $(this).parent().find(".singleChatRoomMessageSpace")[0].scrollTop = $(this).parent().find(".singleChatRoomMessageSpace")[0].scrollHeight
         }else{
@@ -228,11 +230,56 @@ $(function () {
             $(this).parent().find(".singleChatRoomMessageSpace").css("display","none")
             $(this).parent().find(".singleChatRoomText").css("display","none")
             $(this).parent().find(".singleChatRoomTextButton").css("display","none")
+            $(this).parent().find(".singleChatRoomVideoCam").css("display", "none")
         }
     })
 
+    /*
+     * Call video cam
+     */
+    $(document).on("click", ".singleChatRoomVideoCam", function (e) {
+
+        var randomVideoChat = makeid(15)
+        $("body").append('<div class="modalBackground"><iframe src="../rtc/' + randomVideoChat + '" frameborder="0" style="position: absolute; top: 10%;left: 10%; height:80%; width:80%; background:black;"></iframe><i class="material-icons videoClose" >close</i></div>')
+        /*
+            var win = window.open("../rtc/"+randomVideoChat, '_blank');
+            win.focus();
+         */
+        chatSocket.send(JSON.stringify({
+            'type': 'chat',
+            'chatType': 'videoAsk',
+            'videoChat': randomVideoChat,
+            'groupname': $(this).parent().parent().parent().attr("id").split("display_room_")[1],
+        }));
+    })
+    /*
+    * accept Call
+    */
+    $(document).on("click", ".modalCallIcon", function (e) {
+        var randomString = $(this).parent().parent().attr("id").split("modal_")[1]
+        setTimeout(function () {
+            /*
+                    var win = window.open("../rtc/"+randomString, '_blank');
+                    win.focus();
+            */
+            $("body").append('<div class="modalBackground"><iframe src="../rtc/' + randomString + '" frameborder="0" style="position: absolute; top: 10%;left: 10%; height:80%; width:80%; background:black;"></iframe><i class="material-icons videoClose" >close</i></div>')
+        }, 50)
+        $(this).parent().parent().parent().remove()
+    })
+    /*
+     * reject Call
+     */
+    $(document).on("click", ".modalEndIcon", function (e) {
+        $(this).parent().parent().parent().remove()
+    })
+
+    $(document).on("click", ".videoClose", function (e) {
+        $(this).parent().remove()
+    })
+
+
     $(document).on("click",".singleChatRoomClose",function (e) {
-        $(this).parent().parent().remove()
+        $(this).parent().parent().parent().remove()
         chatRoomOpenList = chatRoomOpenList.filter(item => item !=$(this).parent().parent().attr("id"))
         if(chatRoomOpenList.length >=3){
             $("#"+chatRoomOpenList[2]).css("display","block")
@@ -325,3 +372,32 @@ function getRoomMessage(groupId) {
  * < 確認是否存在（被創建） >
  * $(parent).find(id).length == 0
  ******/
+Notification.requestPermission()
+
+function notify(message) {
+    // Let's check if the browser supports notifications
+    if (!("Notification" in window)) {
+        alert("This browser does not support desktop notification");
+    }
+
+    // Let's check whether notification permissions have already been granted
+    else if (Notification.permission === "granted") {
+        // If it's okay let's create a notification
+        var notification = new Notification(message);
+    }
+}
+
+/*
+* create random string
+*/
+function makeid(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
+
+//console.log(makeid(15));

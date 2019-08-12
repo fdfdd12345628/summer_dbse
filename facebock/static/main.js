@@ -9,17 +9,44 @@ var remoteStream;
 var turnReady;
 var clickedJoin = false;
 var pcConfig = {
-  'iceServers': [{
-    'urls': 'stun:stun.l.google.com:19302'
-  }]
+    'iceServers': [
+        {urls: 'stun:stun01.sipphone.com'},
+        {urls: 'stun:stun.ekiga.net'},
+        {urls: 'stun:stun.fwdnet.net'},
+        {urls: 'stun:stun.ideasip.com'},
+        {urls: 'stun:stun.iptel.org'},
+        {urls: 'stun:stun.rixtelecom.se'},
+        {urls: 'stun:stun.schlund.de'},
+        {urls: 'stun:stun.l.google.com:19302'},
+        {urls: 'stun:stun1.l.google.com:19302'},
+        {urls: 'stun:stun2.l.google.com:19302'},
+        {urls: 'stun:stun3.l.google.com:19302'},
+        {urls: 'stun:stun4.l.google.com:19302'},
+        {urls: 'stun:stunserver.org'},
+        {urls: 'stun:stun.softjoys.com'},
+        {urls: 'stun:stun.voiparound.com'},
+        {urls: 'stun:stun.voipbuster.com'},
+        {urls: 'stun:stun.voipstunt.com'},
+        {urls: 'stun:stun.voxgratia.org'},
+        {urls: 'stun:stun.xten.com'},
+        {
+            urls: 'turn:numb.viagenie.ca',
+            credential: 'muazkh',
+            username: 'webrtc@live.com'
+        },
+        {
+            urls: 'turn:192.158.29.39:3478?transport=udp',
+            credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+            username: '28224511:1379330808'
+        },
+        {
+            urls: 'turn:192.158.29.39:3478?transport=tcp',
+            credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+            username: '28224511:1379330808'
+        }
+    ]
 };
 
-var roomPeer = []
-var pc0,pc1,pc2,pc3,pc4,pc5,pc6,pc7,pc8,pc9
-var pcList =[pc0,pc1,pc2,pc3,pc4,pc5,pc6,pc7,pc8,pc9]
-var offerName = []
-var connectingName
-var startConnection=[]
 // Set up audio and video regardless of what devices are present.
 var sdpConstraints = {
   offerToReceiveAudio: true,
@@ -29,7 +56,7 @@ var sdpConstraints = {
 // setup send function
 // rtc_name : undefined
 function sendMessage(message) {
-  //console.log('Client sending message: ', message);
+    console.log('Client sending message: ', message);
   chatSocket.send(JSON.stringify({
             'message': message,
             'type':'webrtc',
@@ -45,79 +72,38 @@ chatSocket.onmessage = function(e) {
     console.log('Client received message:', data);
     if (message === 'got user media') {
       //maybeStart();
-      console.log("receive got user media : "+ data['from_user'])
-      if (roomPeer.indexOf(data['from_user']) >= 0 ){
-          console.log("Already Created : "+ data['from_user'])
-        }else{
-          roomPeer.push(data['from_user'])
-          console.log(">>>>>>>>>>>>>creating peer connetion : "+ data['from_user'])
-          connectingName = data['from_user']
-          sendMessage('createPeerConnection')
-          createPeerConnection()
+        if (data['from_user'] != username) {
+            $("#join_button").css("display", "block")
         }
-    } else if(message === 'createPeerConnection'){
-      if (roomPeer.indexOf(data['from_user']) >= 0 ){
-        console.log("Receive CreatePeerConnection , Already Created : "+ data['from_user'])
-      }else{
-        roomPeer.push(data['from_user'])
-        connectingName = data['from_user']
-        console.log("Receive CreatePeerConnection >>>>>>>>>>>>creating peer connetion : "+ data['from_user'])
-        createPeerConnection()
-      }
-    }else if (message.type === 'offer' && clickedJoin) {
+    } else if (message.type === 'offer') {
       if(username !== data['from_user']) {
-        //if (!isInitiator && !isStarted) {
-        if (!isInitiator) {
-          //maybeStart();
+          if (!isInitiator && !isStarted) {
+              maybeStart();
         }
-        if(startConnection.indexOf(data['from_user']) <0 ) {
-          console.log("switch to " + data['from_user'])
-          connectingName = data['from_user']
-          var tmpSessionDes = new RTCSessionDescription(message)
-          pcList[roomPeer.indexOf(data['from_user'])].setRemoteDescription(tmpSessionDes);
+          pc.setRemoteDescription(new RTCSessionDescription(message));
           doAnswer();
-        }
       }
-    //} else if (message.type === 'answer' && isStarted && clickedJoin) {
-    } else if (message.type === 'answer' && clickedJoin) {
-      if(username !== data['from_user'] && startConnection.indexOf(data['from_user'])<0) {
-        console.log("switch to "+ data['from_user'])
-        connectingName = data['from_user']
-        var tmpSessionDes = new RTCSessionDescription(message)
-        pcList[roomPeer.indexOf(data['from_user'])].setRemoteDescription(tmpSessionDes);
-        maybeStart()
+    } else if (message.type === 'answer' && isStarted) {
+        if (username !== data['from_user']) {
+            pc.setRemoteDescription(new RTCSessionDescription(message));
       }
-    //} else if (message.type === 'candidate' && isStarted && clickedJoin) {
-    } else if (message.type === 'candidate' && clickedJoin) {
-      if(username !== data['from_user'] && startConnection.indexOf(data['from_user']) < 0 ) {
+    } else if (message.type === 'candidate' && isStarted) {
         var candidate = new RTCIceCandidate({
-          sdpMLineIndex: message.label,
-          candidate: message.candidate
+            sdpMLineIndex: message.label,
+            candidate: message.candidate
         });
-        console.log("switch to "+ data['from_user'])
-        connectingName = data['from_user']
-        pcList[roomPeer.indexOf(data['from_user'])].addIceCandidate(candidate);
-
-      }else{
-        console.log(">>>>>>>>>>>jump")
-      }
-    //} else if (message === 'bye' && isStarted && clickedJoin) {
-    } else if (message === 'bye' && clickedJoin) {
+        pc.addIceCandidate(candidate);
+    } else if (message === 'bye' && isStarted) {
       handleRemoteHangup();
-
+        isInitiator = true
     } else if (message === "create_or_join") {
       console.log(data["create_or_join"])
-      console.log("switch to "+ data['from_user'])
-      connectingName = data['from_user']
-      if (data["create_or_join"] === "create") {
+        if (data["create_or_join"] === "create" && data['from_user'] !== username) {
         isInitiator = true
-        maybeStart()
+            $("#join_button").css("display", "block")
       } else {
         isChannelReady = true
         maybeStart()
-      }
-      if(data["active"] >2 && data["from_user"] != username){
-        isInitiator = true
       }
     }
 };
@@ -126,38 +112,25 @@ chatSocket.onmessage = function(e) {
 
 var localVideo = document.querySelector('#main_video');
 var remoteVideo = document.querySelector('#second_video');
-var remoteVideoSecond = document.querySelector('#third_video');
-var connectNum =0
-
-/*
-function switchPc(userName){
-  if (roomPeer.indexOf(userName) >= 0 ){
-    pc = pcList[roomPeer.indexOf(userName)]
-    console.log("switch to "+ userName)
-  }else{
-    roomPeer.push(userName)
-    console.log("switch to "+userName)
-    pc = pcList[roomPeer.indexOf(userName)]
-  }
-}
-*/
-
 
 function join_chat()
 {
   sendMessage("create_or_join")
-  $("#join_button").css({display:"none"})
-  clickedJoin = true
+    $("#join_button").remove()
 }
-  navigator.mediaDevices.getUserMedia({
-    audio: true,
-    video: true
-  })
-      .then(gotStream)
-      .catch(function (e) {
-        alert('getUserMedia() error: ' + e.name);
-      });
 
+setTimeout(function () {
+    navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true
+    })
+        .then(gotStream)
+        .catch(function (e) {
+            console.log('getUserMedia() error: ' + e.name);
+            console.log(e)
+            gotStream
+        });
+}, 1500)
 function gotStream(stream) {
   console.log('Adding local stream.');
   localStream = stream;
@@ -181,14 +154,12 @@ if (location.hostname !== 'localhost') {
 }
 
 function maybeStart() {
-  //console.log('>>>>>>> maybeStart() ', isStarted, localStream, isChannelReady);
-  //if (!isStarted && typeof localStream !== 'undefined' && isChannelReady) {
-  console.log('>>>>>>> maybeStart() ',  localStream, isChannelReady);
-  if (typeof localStream !== 'undefined' && isChannelReady) {
+    console.log('>>>>>>> maybeStart() ', isStarted, localStream, isChannelReady);
+    if (!isStarted && typeof localStream !== 'undefined' && isChannelReady) {
     console.log('>>>>>> creating peer connection');
     createPeerConnection();
-    pcList[roomPeer.indexOf(connectingName)].addStream(localStream);
-    //isStarted = true;
+        pc.addStream(localStream);
+        isStarted = true;
     console.log('isInitiator', isInitiator);
     if (isInitiator) {
       console.log("DO CALL")
@@ -204,11 +175,10 @@ window.onbeforeunload = function() {
 
 function createPeerConnection() {
   try {
-    console.log("trying to create peer connection : "+connectingName)
-    pcList[roomPeer.indexOf(connectingName)] = new RTCPeerConnection(pcConfig);
-    pcList[roomPeer.indexOf(connectingName)].onicecandidate = handleIceCandidate;
-    pcList[roomPeer.indexOf(connectingName)].onaddstream = handleRemoteStreamAdded;
-    pcList[roomPeer.indexOf(connectingName)].onremovestream = handleRemoteStreamRemoved;
+      pc = new RTCPeerConnection(pcConfig);
+      pc.onicecandidate = handleIceCandidate;
+      pc.onaddstream = handleRemoteStreamAdded;
+      pc.onremovestream = handleRemoteStreamRemoved;
     console.log('Created RTCPeerConnnection');
   } catch (e) {
     console.log('Failed to create PeerConnection, exception: ' + e.message);
@@ -218,9 +188,7 @@ function createPeerConnection() {
 }
 
 function handleIceCandidate(event) {
-  console.log("trying to send candidate")
-  if (event.candidate && startConnection.indexOf(connectingName)<0) {
-    console.log("sending candidate")
+    if (event.candidate) {
     sendMessage({
       type: 'candidate',
       label: event.candidate.sdpMLineIndex,
@@ -238,20 +206,19 @@ function handleCreateOfferError(event) {
 
 function doCall() {
   console.log('Sending offer to peer');
-  console.log("switching to "+ connectingName)
-  pcList[roomPeer.indexOf(connectingName)].createOffer(setLocalAndSendMessage, handleCreateOfferError);
+    pc.createOffer(setLocalAndSendMessage, handleCreateOfferError);
 }
 
 function doAnswer() {
   console.log('Sending answer to peer.');
-  pcList[roomPeer.indexOf(connectingName)].createAnswer().then(
+    pc.createAnswer().then(
     setLocalAndSendMessage,
     onCreateSessionDescriptionError
   );
 }
 
 function setLocalAndSendMessage(sessionDescription) {
-  pcList[roomPeer.indexOf(connectingName)].setLocalDescription(sessionDescription);
+    pc.setLocalDescription(sessionDescription);
   console.log('setLocalAndSendMessage sending message', sessionDescription);
   sendMessage(sessionDescription);
 }
@@ -292,13 +259,7 @@ function requestTurn(turnURL) {
 function handleRemoteStreamAdded(event) {
   console.log('Remote stream added.');
   remoteStream = event.stream;
-  startConnection.push(connectingName)
-  if(connectNum == 0){
     remoteVideo.srcObject = remoteStream;
-    connectNum +=1
-  }else{
-    remoteVideoSecond.srcObject = remoteStream;
-  }
 }
 
 function handleRemoteStreamRemoved(event) {
@@ -318,11 +279,9 @@ function handleRemoteHangup() {
 }
 
 function stop() {
-  //isStarted = false;
-  //console.log("isStarted",isStarted)
+    isStarted = false;
+    console.log("isStarted", isStarted)
   console.log("isInitiator",isInitiator)
-  pcList[roomPeer.indexOf(connectingName)].close();
-  pcList[roomPeer.indexOf(connectingName)] = null;
-  startConnection[roomPeer.indexOf(connectingName)]=""
-  roomPeer[roomPeer.indexOf(connectingName)] = ""
+    pc.close();
+    pc = null;
 }
