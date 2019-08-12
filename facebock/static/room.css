@@ -75,19 +75,28 @@ body,html{
 	border-top-right-radius: .75vh;
     padding: .5vh;
     overflow: hidden;
+    cursor: pointer;
 }
 .singleChatRoomHeadName{
-	width: 90%;
+    width: 70%;
 	height: 5vh;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
-.singleChatRoomHead > i{
-	float: right;
+
+.singleChatRoomIconSpace {
 	position: absolute;
 	right: 0;
 	top: 0;
+}
+
+.singleChatRoomVideoCam {
+    display: none;
+}
+
+.singleChatRoomIconSpace > .material-icons:hover {
+    color: gray;
 }
 .singleChatRoomHeadNotification{
 	background-color: #80bfff !important;
@@ -120,7 +129,6 @@ body,html{
     min-width: 6%;
 	max-width: 90%;
 	word-wrap: break-word;
-
 }
 .messageFromOther{
 	float: left;
@@ -223,7 +231,7 @@ body,html{
 	width: 5%;
     background-image: url("https://image.flaticon.com/icons/svg/25/25379.svg");
 	background-size: cover;
-     background-position: center;
+    background-position: center;
 	border: 0.1em solid;
 	border-bottom: 0;
 	border-top-left-radius: 1vh;
@@ -241,3 +249,74 @@ body,html{
 	background-size: contain;
 	background-position: center;
 }
+
+.modalBackground {
+    height: 100%;
+    width: 100%;
+    z-index: 10;
+    background-color: rgba(102, 102, 102, 0.5);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.videoCamModal {
+    height: 30vh;
+    width: 30vw;
+    position: absolute;
+    top: 30vh;
+    left: 35vw;
+    border-color: black;
+    background-color: gray;
+    box-shadow: 5px 5px 3px grey;
+    z-index: 15;
+    opacity: 1;
+}
+
+.videoCamModal > img {
+    width: 40%;
+    position: absolute;
+    top: 0;
+    left: 30%;
+    padding: 3%;
+    opacity: 1;
+}
+
+.modalIconSpace {
+    width: 100%;
+    height: 30%;
+    position: absolute;
+    bottom: 0;
+}
+
+.modalCallIcon {
+    color: #00ff00;
+    font-size: 8vh;
+    margin: 0 3vw;
+    cursor: default;
+}
+
+.modalCallIcon:hover {
+    color: green;
+}
+
+.modalEndIcon {
+    color: red;
+    font-size: 8vh;
+    float: right;
+    margin: 0 3vw;
+    cursor: default;
+}
+
+.modalEndIcon:hover {
+    color: #990000;
+}
+
+.videoClose {
+    color: white;
+    position: absolute;
+    top: 10%;
+    left: 88%;
+    cursor: default;
+}
+

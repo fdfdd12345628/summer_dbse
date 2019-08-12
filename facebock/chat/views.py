@@ -47,7 +47,6 @@ def index(request):
             print("null")
             return HttpResponse(200)
 
-
 def rtc(request, room_name):
     return render(request, "chat/rtc.html", {
         'request': request,
@@ -117,7 +116,6 @@ def room(request):
         elif request.POST.get("type", "") == "getRoomMessage":
             groupId = request.POST.get("groupId")
             messageNum = int(request.POST.get("messageNum"))
-            # [messageNum:messageNum+9] => 一次讀取9條訊息
             returnMessageObjectList = Message.objects.filter(to_group_id=groupId).order_by('-id')[
                                       messageNum:messageNum + 9]
             print(messageNum)
@@ -125,7 +123,6 @@ def room(request):
                               "fromUser": True if ele.from_user_id == request.user.id else False} for ele in
                              returnMessageObjectList]
             return JsonResponse({"returnMessage": returnMessage})
-
 
 # Create your views here.
 
