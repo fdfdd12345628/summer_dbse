@@ -20,20 +20,24 @@
 <input id="chat-message-submit" type="button" value="chat"/>
 <input id="notification-message-submit" type="button" value="notification"/>
 
+
 <div class="chatRoomList">
-    <div class="chatRoomListSelf">
+	<div class="chatRoomListSelf">
 		<img src="../static/avatar.jpg" alt="none" class="chatRoomListAvatar">
 		<h2>{{Self_User.username}}</h2>
 	</div>
-    <div class="existRoomList">
+	<div class="existRoomList">
+		<div class="createNewRoom" onclick="createNewRoom()">
+			<img src="https://image.flaticon.com/icons/svg/54/54443.svg" alt="none">
+		</div>
 		{% for room in Existed_Group %}
 		<div class="singleExistRoom" id="room_{{ room.id }}">
 			<img src="https://image.flaticon.com/icons/svg/784/784662.svg" alt="none">
-            {{ room.display_name }}
+			{{ room.display_name }}
 		</div>
 		{% endfor %}
 	</div>
-    <div class="existAllUser">
+	<div class="existAllUser">
 		{% for user in All_User %}
 		<div class="singleChatUser" id="user_{{ user.id }}">
 			<img src="https://image.flaticon.com/icons/svg/149/149452.svg" alt="none">
@@ -43,42 +47,45 @@
 	</div>
 </div>
 <div class="chatRoomSpace">
-    <!--
+	<!--
     <div class="chatRoomOverFlow"></div>
     -->
-    <!--
-	<div class="singleChatRoom unOpenChatRoom">
-		<div class="singleChatRoomHead">
-			<div class="singleChatRoomHeadName">
-				RoomName when overflow
-			</div>
-			<i class="material-icons singleChatRoomClose" >close</i>
-		</div>
-		<div class="singleChatRoomMessageSpace" style="display: block;">
-			<div class="chatRoomMessage">
+	<!--
+    <div class="singleChatRoom unOpenChatRoom">
+        <div class="singleChatRoomHead">
+            <div class="singleChatRoomHeadName">
+                RoomName when overflow
+            </div>
+            <div class="singleChatRoomIconSpace">
+                <i class="material-icons singleChatRoomVideoCam">videocam</i>
+                <i class="material-icons singleChatRoomClose" >close</i>
+            </div>
+        </div>
+        <div class="singleChatRoomMessageSpace" style="display: block;">
+            <div class="chatRoomMessage">
                 <div class="messageFromSelf">
-					Test Message
-				</div>
-			</div>
-			<div class="chatRoomMessage">
-				<div class="chatRoomAvatarSpace">
-					<img src="../static/avatar.jpg" alt="none" class="chatRoomAvatar">
-				</div>
-				<div class="messageFromOther">
-					Test Message From Other if too long
-				</div>
+                    Test Message
+                </div>
+            </div>
+            <div class="chatRoomMessage">
+                <div class="chatRoomAvatarSpace">
+                    <img src="../static/avatar.jpg" alt="none" class="chatRoomAvatar">
+                </div>
+                <div class="messageFromOther">
+                    Test Message From Other if too long
+                </div>
 
-			</div>
-			<div class="chatRoomMessage">
+            </div>
+            <div class="chatRoomMessage">
                 <div class="messageFromSelf">
-					Test Message
-				</div>
-			</div>
-		</div>
-		<textarea class="singleChatRoomText"></textarea>
-		<button class="singleChatRoomTextButton"></button>
-	</div>
-	-->
+                    Test Message
+                </div>
+            </div>
+        </div>
+        <textarea class="singleChatRoomText"></textarea>
+        <button class="singleChatRoomTextButton"></button>
+    </div>
+    -->
 </div>
 <div id="notification_icon" class="None_Notification">
 	<span class="redpoint" id="notification_redpoint">0</span>
@@ -92,15 +99,56 @@
 	{% endif %}
 	{% endfor %}
 </div>
+<!--
+<div class="modalBackground">
+	<div class="videoCamModal">
+		<img src="https://image.flaticon.com/icons/svg/181/181549.svg" alt="">
+		<div class="modalIconSpace"></div>
+			<i class="material-icons modalCallIcon">call</i>
+			<i class="material-icons modalEndIcon">call_end</i>
+		</div>
+	</div>
+</div>
+<div class="modalBackground">
+	<iframe src="../rtc/abc" frameborder="0" style="position: absolute; top: 10%;left: 10%; height:80%; width:80%; background:black;"></iframe>
+	<i class="material-icons videoClose" >close</i>
+</div>
+<div class="modalBackground">
+	<div class="createNewRoomModal">
+		<i class="material-icons createNewRoomClose" >close</i>
+		<h2><i>Create New Room</i></h2>
+		<div class="createNewRoomName">
+			<img src="https://image.flaticon.com/icons/svg/1250/1250925.svg" alt="none">
+			<textarea name="roomName" id="roomNameSpace" cols="30" rows="1" placeholder="輸入新群組名稱"></textarea>
+		</div>
+		<div class="createNewRoomPeople">
+			<div class="allUserForchoose">
+				<label><input type="checkbox" class="newRoomUserOption" name="nckuee" value="nckuee"> nckuee</label><br>
+			</div>
+			<div class="userChosen">
+				<div class="singleUserChosen">
+					<span>nckuee</span>
+					<i class="material-icons singleUserChosenClose" >close</i>
+				</div>
+			</div>
+		</div>
+		<button class="newRoomModalSend">確認</button>
+	</div>
+</div>
+-->
 </body>
 <script>
+    var allUser = []
+	{% for user in All_User %}
+		allUser.push("{{ user.username }}")
+	{% endfor %}
 	/******
 	 關於 ws的前端
 	 ******/
 	var roomName = "{{ room_name_json }}";
 	var chatSocket = new WebSocket(
 			'wss://' + window.location.host +
-			'/ws/chat/' + roomName + '/');
+			'/websocket/chat/' + roomName + '/');
 
 	/******
 	 當訊息進入前端 進入 onmessage
@@ -132,20 +180,31 @@
 				}else{
 					chatRoomOpenList.push("display_" + this.id)
 					if(chatRoomOpenList.length <4) {
-						$(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" id="display_room_'+group_name+'"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> '+display_name+'</div> <i class="material-icons singleChatRoomClose" style="float: right">close</i> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
+						$(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" id="display_room_'+group_name+'"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> '+display_name+'</div> <div class="singleChatRoomIconSpace"><i class="material-icons singleChatRoomVideoCam">videocam</i><i class="material-icons singleChatRoomClose" >close</i></div> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
 					}else if(chatRoomOpenList.length == 4){
-						$(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" style="display: none" id="display_room_' + group_name + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + display_name + '</div> <i class="material-icons singleChatRoomClose" style="float: right">close</i> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
+						$(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" style="display: none" id="display_room_' + group_name + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + display_name + '</div> <div class="singleChatRoomIconSpace"><i class="material-icons singleChatRoomVideoCam">videocam</i><i class="material-icons singleChatRoomClose" >close</i></div> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
 						$(".chatRoomSpace").append('<div class="chatRoomOverFlow"></div>')
 					}else{
-						$('<div class="singleChatRoom unOpenChatRoom" style="display: none" id="display_room_' + group_name + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + display_name + '</div> <i class="material-icons singleChatRoomClose" style="float: right">close</i> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>').insertBefore($(".chatRoomOverFlow"))
+						$('<div class="singleChatRoom unOpenChatRoom" style="display: none" id="display_room_' + group_name + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + display_name + '</div> <div class="singleChatRoomIconSpace"><i class="material-icons singleChatRoomVideoCam">videocam</i><i class="material-icons singleChatRoomClose" >close</i></div> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>').insertBefore($(".chatRoomOverFlow"))
 					}
 					$("#display_room_"+group_name).find(".singleChatRoomMessageSpace").append('<div class="chatRoomMessage"><div class="chatRoomAvatarSpace"><img src="../static/avatar.jpg" alt="none" class="chatRoomAvatar"></div><div class="messageFromOther">'+ message +'</div></div>');
 					getRoomMessage(group_name)
 					$("#display_room_"+ group_name +" > .singleChatRoomMessageSpace").bindScrollHandler()
 				}
 				if($("#display_room_"+group_name).hasClass("unOpenChatRoom")){
-				    $("#display_room_"+group_name).find(".singleChatRoomHead").addClass("singleChatRoomHeadNotification")
+					$("#display_room_"+group_name).find(".singleChatRoomHead").addClass("singleChatRoomHeadNotification")
 				}
+			}
+		}else if(type == 'videoAsk'){
+		    console.log(data['from_user'])
+			console.log("{{ request.user.username }}")
+            if( data['from_user'] != "{{ request.user.username }}"){
+				$("body").append('<div class="modalBackground"><div class="videoCamModal" id="modal_'+ data["videoChat"]+'"><img src="https://image.flaticon.com/icons/svg/181/181549.svg" alt=""><div class="modalIconSpace"></divc><i class="material-icons modalCallIcon">call</i><i class="material-icons modalEndIcon">call_end</i></div></div></div>')
+			}
+			if (document.hasFocus()) {
+				console.log("normal")
+			}else{
+				var notification = new Notification("Video Call");
 			}
 		}
 		//document.querySelector('#chat-log').value += (message + '\n');

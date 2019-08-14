@@ -114,6 +114,20 @@ def room(request):
                 content["id"] = Redundant_Group.first().id
                 content["display_name"] = Redundant_Group.first().display_name
                 return HttpResponse(json.dumps(content))
+        elif request.POST.get("type","") == 'Create_Group_Multiple':
+            content={}
+            roomUser = request.POST.getlist("user[]","")
+            print(roomUser)
+            Create_Group = Group.objects.create(
+                display_name=request.POST.get("displayName",""),
+                type="multiple")
+            Create_Group.save()
+            Create_Group.user.add(request.user)
+            for user in roomUser:
+                Create_Group.user.add(User.objects.get(username = user))
+            content["id"] = Create_Group.id
+            content["display_name"] = Create_Group.display_name
+            return HttpResponse(json.dumps(content))
         elif request.POST.get("type", "") == "getRoomMessage":
             groupId = request.POST.get("groupId")
             messageNum = int(request.POST.get("messageNum"))
