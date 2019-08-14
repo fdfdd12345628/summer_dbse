@@ -32,7 +32,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.channel_name,
         )
         await self.channel_layer.group_add(
-            'rtc',
+            self.room_name,
             self.channel_name,
         )
 
@@ -117,7 +117,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             rtc_name = text_data_json['rtc_name']
             message = text_data_json['message']
             await self.channel_layer.group_send(
-                'rtc',
+                self.room_name,
                 {
                     'type': 'webrtc',
                     'message': message,
@@ -283,3 +283,4 @@ class ChatConsumer(AsyncWebsocketConsumer):
         group = Group.objects.get(pk=group_name)
         all_layer = Clients.objects.filter(user__in=[each for each in group.user.all()])
         return [layer.layer for layer in all_layer]
+

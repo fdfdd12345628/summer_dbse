@@ -9,9 +9,42 @@ var remoteStream;
 var turnReady;
 
 var pcConfig = {
-  'iceServers': [{
-    'urls': 'stun:stun.l.google.com:19302'
-  }]
+    'iceServers': [
+        {urls: 'stun:stun01.sipphone.com'},
+        {urls: 'stun:stun.ekiga.net'},
+        {urls: 'stun:stun.fwdnet.net'},
+        {urls: 'stun:stun.ideasip.com'},
+        {urls: 'stun:stun.iptel.org'},
+        {urls: 'stun:stun.rixtelecom.se'},
+        {urls: 'stun:stun.schlund.de'},
+        {urls: 'stun:stun.l.google.com:19302'},
+        {urls: 'stun:stun1.l.google.com:19302'},
+        {urls: 'stun:stun2.l.google.com:19302'},
+        {urls: 'stun:stun3.l.google.com:19302'},
+        {urls: 'stun:stun4.l.google.com:19302'},
+        {urls: 'stun:stunserver.org'},
+        {urls: 'stun:stun.softjoys.com'},
+        {urls: 'stun:stun.voiparound.com'},
+        {urls: 'stun:stun.voipbuster.com'},
+        {urls: 'stun:stun.voipstunt.com'},
+        {urls: 'stun:stun.voxgratia.org'},
+        {urls: 'stun:stun.xten.com'},
+        {
+            urls: 'turn:numb.viagenie.ca',
+            credential: 'muazkh',
+            username: 'webrtc@live.com'
+        },
+        {
+            urls: 'turn:192.158.29.39:3478?transport=udp',
+            credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+            username: '28224511:1379330808'
+        },
+        {
+            urls: 'turn:192.158.29.39:3478?transport=tcp',
+            credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+            username: '28224511:1379330808'
+        }
+    ]
 };
 
 // Set up audio and video regardless of what devices are present.
@@ -95,6 +128,18 @@ function join_chat()
         console.log('getUserMedia() error: ' + e.name);
       });
 
+setTimeout(function () {
+    navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true
+    })
+        .then(gotStream)
+        .catch(function (e) {
+            console.log('getUserMedia() error: ' + e.name);
+            console.log(e)
+            gotStream
+        });
+}, 1500)
 function gotStream(stream) {
   console.log('Adding local stream.');
   localStream = stream;

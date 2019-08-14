@@ -231,6 +231,7 @@ $(function () {
             $(this).parent().find(".singleChatRoomText").css("display","none")
             $(this).parent().find(".singleChatRoomTextButton").css("display","none")
             $(this).parent().find(".singleChatRoomVideoCam").css("display","none")
+
         }
     })
 
@@ -280,6 +281,7 @@ $(function () {
     $(document).on("click",".videoClose",function (e) {
         $(this).parent().remove()
     })
+
 
     $(document).on("click",".singleChatRoomClose",function (e) {
         $(this).parent().parent().parent().remove()
@@ -451,6 +453,7 @@ function getRoomMessage(groupId) {
  * $(parent).find(id).length == 0
  ******/
 Notification.requestPermission()
+
 function notify(message) {
     // Let's check if the browser supports notifications
     if (!("Notification" in window)) {
@@ -487,4 +490,3 @@ function createNewRoom() {
         $(".allUserForchoose").append('<label><input type="checkbox" class="newRoomUserOption" name="'+allUser[i]+'" value="'+allUser[i]+'"> '+allUser[i]+'</label><br>')
     }
 }
-
