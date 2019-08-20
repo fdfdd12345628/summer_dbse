@@ -67,6 +67,8 @@ def room(request):
             # 若有好友系統也可在此更改(?
             All_Involved_Group = Group.objects.filter(user__in=[userid])
             # Group中含有自己的 放入聊天室
+            for group in All_Involved_Group:
+                group.display_name = group.display_name.replace(request.user.username,'').replace("_with_","")
         else:
             All_Notification = []
             All_User = []
