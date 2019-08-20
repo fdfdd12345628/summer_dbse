@@ -342,6 +342,7 @@ body,html{
 	background-color: white;
 	border-radius: 1vh;
 	box-shadow: 3px 3px 3px grey;
+	outline: none;
 }
 .createNewRoomModal > h1{
     font-size: 5vh;

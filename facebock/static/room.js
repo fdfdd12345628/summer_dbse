@@ -242,7 +242,11 @@ $(function () {
      */
     $(document).on("change",".newRoomUserOption",function (e) {
         console.log($(this).attr("name"))
-        $(".userChosen").append('<div class="singleUserChosen"><span>'+$(this).attr("name")+'</span><i class="material-icons singleUserChosenClose" >close</i></div>')
+        if($(this).is(":checked")){
+            $(".userChosen").append('<div class="singleUserChosen" id="userChosen_'+$(this).attr("name")+'"><span>'+$(this).attr("name")+'</span><i class="material-icons singleUserChosenClose" >close</i></div>')
+        }else{
+            $("#userChosen_"+$(this).attr("name")).remove()
+        }
     })
 
     /*
@@ -260,8 +264,14 @@ $(function () {
      */
     $(document).on("click",".singleUserChosenClose", function (e) {
         $(this).parent().remove()
-    })
+        $(".allUserForchoose").find("input[name="+$(this).parent().find("span").text()+"]").prop("checked",false)
 
+    })
+    $(document).on("keyup",".createNewRoomModal",function(e){
+       if(e.key === "Escape"){
+           $(".modalBackground").remove()
+       }
+    })
     /*
         create new room send out
      */
@@ -407,8 +417,9 @@ Create New Room
  */
 function createNewRoom() {
    console.log("createNewRoom")
-    $("body").append('<div class="modalBackground"><div class="createNewRoomModal"><i class="material-icons createNewRoomClose" >close</i><h2><i>Create New Room</i></h2><div class="createNewRoomName"><img src="https://image.flaticon.com/icons/svg/1250/1250925.svg" alt="none"><textarea name="roomName" id="roomNameSpace" cols="30" rows="1" placeholder="輸入新群組名稱"></textarea></div><div class="createNewRoomPeople"><div class="allUserForchoose"></div><div class="userChosen"></div></div><button class="newRoomModalSend">確認</button></div></div>')
+    $("body").append('<div class="modalBackground"><div class="createNewRoomModal" tabindex="0"><i class="material-icons createNewRoomClose" >close</i><h2><i>Create New Room</i></h2><div class="createNewRoomName"><img src="https://image.flaticon.com/icons/svg/1250/1250925.svg" alt="none"><textarea name="roomName" id="roomNameSpace" cols="30" rows="1" placeholder="輸入新群組名稱"></textarea></div><div class="createNewRoomPeople"><div class="allUserForchoose"></div><div class="userChosen"></div></div><button class="newRoomModalSend">確認</button></div></div>')
     for(var i in allUser){
         $(".allUserForchoose").append('<label><input type="checkbox" class="newRoomUserOption" name="'+allUser[i]+'" value="'+allUser[i]+'"> '+allUser[i]+'</label><br>')
     }
+    $("#roomNameSpace").focus()
 }
