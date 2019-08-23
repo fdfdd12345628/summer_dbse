@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 	{% load static %}
 	<link  rel="stylesheet" href="{% static 'room.css'%}">
+	<link  rel="stylesheet" href="{% static 'notification.css'%}">
 	<script src="{% static 'room.js' %}"></script>
 	<script src="{% static 'notification.js' %}"></script>
 </head>
@@ -48,7 +49,9 @@
 </div>
 <div class="chatRoomSpace">
 	<!--
-    <div class="chatRoomOverFlow"></div>
+    <div class="chatRoomOverFlow"><div class="chatRoomOverFlowList">
+		<div class="overFlowRoom"><span>nckuee</span></div>
+	</div></div>
     -->
 	<!--
     <div class="singleChatRoom unOpenChatRoom">
@@ -99,43 +102,6 @@
 	{% endif %}
 	{% endfor %}
 </div>
-<!--
-<div class="modalBackground">
-	<div class="videoCamModal">
-		<img src="https://image.flaticon.com/icons/svg/181/181549.svg" alt="">
-		<div class="modalIconSpace"></div>
-			<i class="material-icons modalCallIcon">call</i>
-			<i class="material-icons modalEndIcon">call_end</i>
-		</div>
-	</div>
-</div>
-<div class="modalBackground">
-	<iframe src="../rtc/abc" frameborder="0" style="position: absolute; top: 10%;left: 10%; height:80%; width:80%; background:black;"></iframe>
-	<i class="material-icons videoClose" >close</i>
-</div>
-<div class="modalBackground">
-	<div class="createNewRoomModal">
-		<i class="material-icons createNewRoomClose" >close</i>
-		<h2><i>Create New Room</i></h2>
-		<div class="createNewRoomName">
-			<img src="https://image.flaticon.com/icons/svg/1250/1250925.svg" alt="none">
-			<textarea name="roomName" id="roomNameSpace" cols="30" rows="1" placeholder="輸入新群組名稱"></textarea>
-		</div>
-		<div class="createNewRoomPeople">
-			<div class="allUserForchoose">
-				<label><input type="checkbox" class="newRoomUserOption" name="nckuee" value="nckuee"> nckuee</label><br>
-			</div>
-			<div class="userChosen">
-				<div class="singleUserChosen">
-					<span>nckuee</span>
-					<i class="material-icons singleUserChosenClose" >close</i>
-				</div>
-			</div>
-		</div>
-		<button class="newRoomModalSend">確認</button>
-	</div>
-</div>
--->
 </body>
 <script>
     var allUser = []
@@ -183,9 +149,11 @@
 						$(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" id="display_room_'+group_name+'"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> '+display_name+'</div> <div class="singleChatRoomIconSpace"><i class="material-icons singleChatRoomVideoCam">videocam</i><i class="material-icons singleChatRoomClose" >close</i></div> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
 					}else if(chatRoomOpenList.length == 4){
 						$(".chatRoomSpace").append('<div class="singleChatRoom unOpenChatRoom" style="display: none" id="display_room_' + group_name + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + display_name + '</div> <div class="singleChatRoomIconSpace"><i class="material-icons singleChatRoomVideoCam">videocam</i><i class="material-icons singleChatRoomClose" >close</i></div> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>')
-						$(".chatRoomSpace").append('<div class="chatRoomOverFlow"></div>')
+						$(".chatRoomSpace").append('<div class="chatRoomOverFlow"><div class="chatRoomOverFlowList"></div></div>>')
+						overFlowRoom(display_name,"display_room_"+group_name)
 					}else{
 						$('<div class="singleChatRoom unOpenChatRoom" style="display: none" id="display_room_' + group_name + '"> <div class="singleChatRoomHead"><div class="singleChatRoomHeadName"> ' + display_name + '</div> <div class="singleChatRoomIconSpace"><i class="material-icons singleChatRoomVideoCam">videocam</i><i class="material-icons singleChatRoomClose" >close</i></div> </div> <div class="singleChatRoomMessageSpace"> </div> <textarea class="singleChatRoomText"></textarea><button class="singleChatRoomTextButton"></button></div>').insertBefore($(".chatRoomOverFlow"))
+						overFlowRoom(display_name,"display_room_"+group_name)
 					}
 					$("#display_room_"+group_name).find(".singleChatRoomMessageSpace").append('<div class="chatRoomMessage"><div class="chatRoomAvatarSpace"><img src="../static/avatar.jpg" alt="none" class="chatRoomAvatar"></div><div class="messageFromOther">'+ message +'</div></div>');
 					getRoomMessage(group_name)
@@ -213,17 +181,6 @@
 	chatSocket.onclose = function (e) {
 		console.error('Chat socket closed unexpectedly');
 	};
-
-	document.querySelector('#chat-message-input').focus();
-	/********
-	 initially existed, no use
-	 document.querySelector('#chat-message-input').onkeyup = function (e) {
-        if (e.keyCode === 13) {  // enter, return
-            document.querySelector('#chat-message-submit').click();
-        }
-    };
-	 *********/
-
 
 	document.querySelector('#notification-message-submit').onclick = function (e) {
 		var messageInputDom = document.querySelector('#chat-message-input');

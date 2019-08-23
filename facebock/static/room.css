@@ -3,40 +3,6 @@ body,html{
 	margin: 0;
 }
 
-#notification_icon{
-	position:absolute;
-	top:2vh;
-	right:20vw;
-	height:5vh;
-	width:5vh;
-}
-.None_Notification{
-	background-image : url(https://image.flaticon.com/icons/svg/814/814587.svg);
-}
-.Notification{
-	background-image : url(https://image.flaticon.com/icons/svg/814/814513.svg);
-}
-.redpoint{
-	display:none;
-	height:16px;
-	width:16px;
-	line-height:16px;
-	text-align:center;
-	font-size:0.1em;
-	border-radius:16px;
-	color:#fff;
-	background:red;
-	position: relative;
-	top: -8px;
-	right: 8px;
-}
-#notification_list_group{
-	position:absolute;
-	top: 7vh;
-	right: 2vh;
-	width:20vw;
-	display:none;
-}
 .chatRoomSpace{
 	height: 40%;
 	width : 80vw;
@@ -57,6 +23,7 @@ body,html{
 	top: 35vh;
 	margin: 0 1% ;
 	outline: none;
+	display: block;
 }
 .unOpenChatRoom{
 	width: 15%;
@@ -160,6 +127,7 @@ body,html{
 	border: none;
 	height: 4.75vh;
 	overflow: hidden;
+    resize: none;
 }
 .singleChatRoomTextButton{
 	background-image: url("https://image.flaticon.com/icons/svg/71/71746.svg");
@@ -263,6 +231,38 @@ body,html{
 	position: relative;
 	top: 35vh;
 	margin: 0 1%;
+}
+.chatRoomOverFlowList{
+	width:10vw;
+	min-height: 1vh;
+	position: absolute;
+	bottom:103%;
+	right: 0;
+	border: 0.2vh solid;
+	border-radius: 1vh;
+	display: none;
+	background-color: #e6e6e6;
+}
+.overFlowRoom{
+	width: 100%;
+	height: 5vh;
+	text-align: center;
+	text-overflow: ellipsis;
+	display: inline-block;
+	vertical-align: middle;
+    cursor: pointer;
+}
+.overFlowRoom:hover{
+	background-color: #cce6ff;
+}
+.overFlowRoom > span{
+	-webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
 }
 .chatRoomLoadMessage{
 	height: 5vh;

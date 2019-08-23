@@ -1,0 +1,34 @@
+#notification_icon{
+    position:absolute;
+    top:2vh;
+    right:20vw;
+    height:5vh;
+    width:5vh;
+}
+.None_Notification{
+    background-image : url(https://image.flaticon.com/icons/svg/814/814587.svg);
+}
+.Notification{
+    background-image : url(https://image.flaticon.com/icons/svg/814/814513.svg);
+}
+.redpoint{
+    display:none;
+    height:16px;
+    width:16px;
+    line-height:16px;
+    text-align:center;
+    font-size:0.1em;
+    border-radius:16px;
+    color:#fff;
+    background:red;
+    position: relative;
+    top: -8px;
+    right: 8px;
+}
+#notification_list_group{
+    position:absolute;
+    top: 7vh;
+    right: 2vh;
+    width:20vw;
+    display:none;
+}

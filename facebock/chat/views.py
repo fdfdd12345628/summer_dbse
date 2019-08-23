@@ -109,11 +109,11 @@ def room(request):
                 #   type: "single"
                 #   user: many to many
                 content["id"] = Create_Group.id
-                content["display_name"] = Create_Group.display_name
+                content["display_name"] = Create_Group.display_name.replace(request.user.username,'').replace("_with_","")
                 return HttpResponse(json.dumps(content))
             else:
                 content["id"] = Redundant_Group.first().id
-                content["display_name"] = Redundant_Group.first().display_name
+                content["display_name"] = Redundant_Group.first().display_name.replace(request.user.username,'').replace("_with_","")
                 return HttpResponse(json.dumps(content))
         elif request.POST.get("type","") == 'Create_Group_Multiple':
             content={}
@@ -135,9 +135,12 @@ def room(request):
             returnMessageObjectList = Message.objects.filter(to_group_id=groupId).order_by('-id')[
                                       messageNum:messageNum + 9]
             print(messageNum)
-            returnMessage = [{"content": ele.content, "date": ele.date,
+            returnMessage = [{"content": ele.content,
+                              "date": ele.date,
+                              "fromUserName":ele.from_user.username,
                               "fromUser": True if ele.from_user_id == request.user.id else False} for ele in
-                             returnMessageObjectList]
+                             returnMessageObjectList
+                             ]
             return JsonResponse({"returnMessage": returnMessage})
 
 # Create your views here.
