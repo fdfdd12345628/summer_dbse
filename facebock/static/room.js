@@ -125,6 +125,20 @@ $(function(){
      {因 通知對人 聊天對聊天室}
      ******/
 
+    $(document).on("click",".singleChatRoomTextButton",function (e) {
+        var $this = $(this).parent().find(".singleChatRoomText")
+        if($this.val().length>0){
+            $this.parent().find(".singleChatRoomMessageSpace").append('<div class="chatRoomMessage"><div class="messageFromSelf">' + $this.val() + '</div></div>');
+            chatSocket.send(JSON.stringify({
+                'message': $this.val(),
+                'type': 'chat',
+                'chatType': 'text',
+                'groupname': $this.parent().attr("id").split("display_room_")[1],
+            }));
+            $this.parent().find(".singleChatRoomMessageSpace")[0].scrollTop = $this.parent().find(".singleChatRoomMessageSpace")[0].scrollHeight
+        }
+        setTimeout(function(){ $this.val("") }, 3);
+    })
 
 })
 $(function () {
@@ -209,7 +223,6 @@ $(function () {
 
     // 按esc離開聊天視窗
     $(document).on("keyup",".singleChatRoomText , .singleChatRoom",function (e) {
-        console.log(e)
         if(e.key === "Escape"){
             if($(this).hasClass("singleChatRoomText")){
                 $(this).parent().remove()
@@ -448,7 +461,9 @@ function switchOverFlowRoom(roomId){
     })
     overFlowRoomList.eq(-1).css("display","none")
     $("#"+roomId).css("display","block")
-    $("#"+roomId).find(".singleChatRoomHead").trigger("click")
+    if($("#"+roomId).hasClass("unOpenChatRoom")){
+        $("#"+roomId).find(".singleChatRoomHead").trigger("click")
+    }
     overFlowRoom(overFlowRoomList.eq(-1).find(".singleChatRoomHead").find(".singleChatRoomHeadName").text().replace(/\s/g, ""),overFlowRoomList.eq(-1).attr("id"))
 }
 
