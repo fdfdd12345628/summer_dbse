@@ -1,0 +1,58 @@
+{% block head %}
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	{% load static %}
+	<link  rel="stylesheet" href="{% static 'notification.css'%}">
+	<script src="{% static 'notification.js' %}"></script>
+{% endblock%}
+{% block content %}
+<div id="notification_icon" class="None_Notification">
+	<span class="redpoint" id="notification_redpoint">0</span>
+</div>
+<div class="list-group" id="notification_list_group" >
+	{% for ele in All_Notification reversed %}
+	{% if ele.seen %}
+	<a href="#" class="list-group-item list-group-item-action" id="notification_{{ele.id}}">{{ele.content}}</a>
+	{% else %}
+	<a href="#" class="list-group-item list-group-item-action list-group-item-primary"id="notification_{{ele.id}}">{{ele.content}}</a>
+	{% endif %}
+	{% endfor %}
+</div>
+{% endblock %}
+{% block js %}
+<script>
+	var roomName = "{{ room_name_json }}";
+	var chatSocket = new WebSocket(
+			'wss://' + window.location.host +
+			'/websocket/chat/' + roomName + '/');
+
+	/******
+	 當訊息進入前端 進入 onmessage
+	 ******/
+	chatSocket.onmessage = function (e) {
+		var data = JSON.parse(e.data);
+		var message = data['message'];
+		var type = data['type'];
+		//判斷類別
+		if (type == "notification") {
+			//新增通知
+			add_red_point("notification_redpoint");
+			var notification_id = data["id"]
+			//加入通知內容
+			if ($("#notification_list_group > a").length) {
+				$('<a href="#" class="list-group-item list-group-item-action list-group-item-primary"id="notification_' + notification_id + '">' + message + '</a>').insertBefore($("#notification_list_group a:first-child"));
+			} else {
+				$("#notification_list_group").append('<a href="#" class="list-group-item list-group-item-action list-group-item-primary"id="notification_' + notification_id + '">' + message + '</a>')
+			}
+		}
+	}
+	$(document).ready(function(){
+		{% for ele in All_Notification reversed %}
+		{% if not ele.seen %}
+		add_red_point("notification_redpoint");
+		{% endif %}
+		{% endfor %}
+	})
+</script>
+{% endblock %}

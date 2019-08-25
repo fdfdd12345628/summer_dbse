@@ -7,7 +7,7 @@ var localStream;
 var pc;
 var remoteStream;
 var turnReady;
-var clickedJoin = false;
+
 var pcConfig = {
     'iceServers': [
         {urls: 'stun:stun01.sipphone.com'},
@@ -56,7 +56,7 @@ var sdpConstraints = {
 // setup send function
 // rtc_name : undefined
 function sendMessage(message) {
-    console.log('Client sending message: ', message);
+  console.log('Client sending message: ', message);
   chatSocket.send(JSON.stringify({
             'message': message,
             'type':'webrtc',
@@ -72,41 +72,42 @@ chatSocket.onmessage = function(e) {
     console.log('Client received message:', data);
     if (message === 'got user media') {
       //maybeStart();
-        if (data['from_user'] != username) {
-            $("#join_button").css("display", "block")
-        }
+      if(data['from_user'] != username){
+        $("#join_button").css("display","block")
+      }
     } else if (message.type === 'offer') {
       if(username !== data['from_user']) {
-          if (!isInitiator && !isStarted) {
-              maybeStart();
+        if (!isInitiator && !isStarted) {
+          maybeStart();
         }
-          pc.setRemoteDescription(new RTCSessionDescription(message));
-          doAnswer();
+        pc.setRemoteDescription(new RTCSessionDescription(message));
+        doAnswer();
       }
     } else if (message.type === 'answer' && isStarted) {
-        if (username !== data['from_user']) {
-            pc.setRemoteDescription(new RTCSessionDescription(message));
+      if(username !== data['from_user']) {
+        pc.setRemoteDescription(new RTCSessionDescription(message));
       }
     } else if (message.type === 'candidate' && isStarted) {
-        var candidate = new RTCIceCandidate({
-            sdpMLineIndex: message.label,
-            candidate: message.candidate
-        });
-        pc.addIceCandidate(candidate);
+      var candidate = new RTCIceCandidate({
+        sdpMLineIndex: message.label,
+        candidate: message.candidate
+      });
+      pc.addIceCandidate(candidate);
     } else if (message === 'bye' && isStarted) {
       handleRemoteHangup();
-        isInitiator = true
+      isInitiator = true
     } else if (message === "create_or_join") {
       console.log(data["create_or_join"])
-        if (data["create_or_join"] === "create" && data['from_user'] !== username) {
+      if (data["create_or_join"] === "create" && data['from_user'] !==username) {
         isInitiator = true
-            $("#join_button").css("display", "block")
+        $("#join_button").css("display","block")
       } else {
         isChannelReady = true
         maybeStart()
       }
     }
 };
+
 
 ////////////////////////////////////////////////////
 
@@ -116,8 +117,16 @@ var remoteVideo = document.querySelector('#second_video');
 function join_chat()
 {
   sendMessage("create_or_join")
-    $("#join_button").remove()
+  $("#join_button").remove()
 }
+  navigator.mediaDevices.getUserMedia({
+    audio: true,
+    video: true
+  })
+      .then(gotStream)
+      .catch(function (e) {
+        console.log('getUserMedia() error: ' + e.name);
+      });
 
 setTimeout(function () {
     navigator.mediaDevices.getUserMedia({
@@ -154,12 +163,12 @@ if (location.hostname !== 'localhost') {
 }
 
 function maybeStart() {
-    console.log('>>>>>>> maybeStart() ', isStarted, localStream, isChannelReady);
-    if (!isStarted && typeof localStream !== 'undefined' && isChannelReady) {
+  console.log('>>>>>>> maybeStart() ', isStarted, localStream, isChannelReady);
+  if (!isStarted && typeof localStream !== 'undefined' && isChannelReady) {
     console.log('>>>>>> creating peer connection');
     createPeerConnection();
-        pc.addStream(localStream);
-        isStarted = true;
+    pc.addStream(localStream);
+    isStarted = true;
     console.log('isInitiator', isInitiator);
     if (isInitiator) {
       console.log("DO CALL")
@@ -175,10 +184,10 @@ window.onbeforeunload = function() {
 
 function createPeerConnection() {
   try {
-      pc = new RTCPeerConnection(pcConfig);
-      pc.onicecandidate = handleIceCandidate;
-      pc.onaddstream = handleRemoteStreamAdded;
-      pc.onremovestream = handleRemoteStreamRemoved;
+    pc = new RTCPeerConnection(pcConfig);
+    pc.onicecandidate = handleIceCandidate;
+    pc.onaddstream = handleRemoteStreamAdded;
+    pc.onremovestream = handleRemoteStreamRemoved;
     console.log('Created RTCPeerConnnection');
   } catch (e) {
     console.log('Failed to create PeerConnection, exception: ' + e.message);
@@ -188,7 +197,7 @@ function createPeerConnection() {
 }
 
 function handleIceCandidate(event) {
-    if (event.candidate) {
+  if (event.candidate) {
     sendMessage({
       type: 'candidate',
       label: event.candidate.sdpMLineIndex,
@@ -206,19 +215,19 @@ function handleCreateOfferError(event) {
 
 function doCall() {
   console.log('Sending offer to peer');
-    pc.createOffer(setLocalAndSendMessage, handleCreateOfferError);
+  pc.createOffer(setLocalAndSendMessage, handleCreateOfferError);
 }
 
 function doAnswer() {
   console.log('Sending answer to peer.');
-    pc.createAnswer().then(
+  pc.createAnswer().then(
     setLocalAndSendMessage,
     onCreateSessionDescriptionError
   );
 }
 
 function setLocalAndSendMessage(sessionDescription) {
-    pc.setLocalDescription(sessionDescription);
+  pc.setLocalDescription(sessionDescription);
   console.log('setLocalAndSendMessage sending message', sessionDescription);
   sendMessage(sessionDescription);
 }
@@ -259,7 +268,7 @@ function requestTurn(turnURL) {
 function handleRemoteStreamAdded(event) {
   console.log('Remote stream added.');
   remoteStream = event.stream;
-    remoteVideo.srcObject = remoteStream;
+  remoteVideo.srcObject = remoteStream;
 }
 
 function handleRemoteStreamRemoved(event) {
@@ -279,9 +288,11 @@ function handleRemoteHangup() {
 }
 
 function stop() {
-    isStarted = false;
-    console.log("isStarted", isStarted)
+  isStarted = false;
+  console.log("isStarted",isStarted)
   console.log("isInitiator",isInitiator)
-    pc.close();
-    pc = null;
+  pc.close();
+  pc = null;
 }
+
+

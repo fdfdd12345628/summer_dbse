@@ -171,6 +171,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if message == "create_or_join":
             if len(room_people) == 0:
                 if event['from_user'] not in room_people:
+                    print(">>>>>>>>append<<<<<<< when 0")
                     room_people.append(event['from_user'])
                 print(room_people)
                 await self.send(text_data=json.dumps({

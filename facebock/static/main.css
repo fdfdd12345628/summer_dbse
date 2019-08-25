@@ -1,6 +1,6 @@
 .main_1{
     position: fixed;
-    left: 0%;
+    left: 0;
     bottom: 0;
     min-width: 80%;
     min-height: 80%;
@@ -22,8 +22,9 @@
     bottom: 0;
     min-width: 5%;
     min-height: 5%;
-    max-height:25%;
+    max-width:20%;
     z-index: 1;
+    border: 1pt white;
 }
 #join_button{
     position: fixed;

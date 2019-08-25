@@ -3,40 +3,6 @@ body,html{
 	margin: 0;
 }
 
-#notification_icon{
-	position:absolute;
-	top:2vh;
-	right:20vw;
-	height:5vh;
-	width:5vh;
-}
-.None_Notification{
-	background-image : url(https://image.flaticon.com/icons/svg/814/814587.svg);
-}
-.Notification{
-	background-image : url(https://image.flaticon.com/icons/svg/814/814513.svg);
-}
-.redpoint{
-	display:none;
-	height:16px;
-	width:16px;
-	line-height:16px;
-	text-align:center;
-	font-size:0.1em;
-	border-radius:16px;
-	color:#fff;
-	background:red;
-	position: relative;
-	top: -8px;
-	right: 8px;
-}
-#notification_list_group{
-	position:absolute;
-	top: 7vh;
-	right: 2vh;
-	width:20vw;
-	display:none;
-}
 .chatRoomSpace{
 	height: 40%;
 	width : 80vw;
@@ -56,6 +22,8 @@ body,html{
 	position: relative;
 	top: 35vh;
 	margin: 0 1% ;
+	outline: none;
+	display: block;
 }
 .unOpenChatRoom{
 	width: 15%;
@@ -66,6 +34,7 @@ body,html{
 	width: 25%;
 	height: 40vh;
 	top: 0;
+	outline: 0;
 }
 .singleChatRoomHead{
 	width: 100%;
@@ -78,25 +47,22 @@ body,html{
     cursor: pointer;
 }
 .singleChatRoomHeadName{
-    width: 70%;
+	width: 70%;
 	height: 5vh;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
-
-.singleChatRoomIconSpace {
+.singleChatRoomIconSpace{
 	position: absolute;
 	right: 0;
 	top: 0;
 }
-
-.singleChatRoomVideoCam {
-    display: none;
+.singleChatRoomVideoCam{
+	display: none;
 }
-
-.singleChatRoomIconSpace > .material-icons:hover {
-    color: gray;
+.singleChatRoomIconSpace > .material-icons:hover{
+	color:gray;
 }
 .singleChatRoomHeadNotification{
 	background-color: #80bfff !important;
@@ -161,6 +127,7 @@ body,html{
 	border: none;
 	height: 4.75vh;
 	overflow: hidden;
+    resize: none;
 }
 .singleChatRoomTextButton{
 	background-image: url("https://image.flaticon.com/icons/svg/71/71746.svg");
@@ -173,6 +140,10 @@ body,html{
 	background-size: cover;
 	border: none;
 	display: none;
+	cursor: pointer;
+}
+.singleChatRoomTextButton:focus{
+	outline: none;
 }
 .chatRoomList{
 	height: 100vh;
@@ -211,6 +182,22 @@ body,html{
 	border-bottom-color: #f2f2f2 ;
 	z-index: 0;
 }
+.existAllUser{
+	width: 100%;
+	overflow: auto;
+	max-height: 50vh;
+}
+.createNewRoom{
+	height: 5vh;
+	width: 100%;
+    cursor: pointer;
+}
+.createNewRoom > img{
+	height: 4vh;
+	width: 4vh;
+	margin: auto;
+    display: block;
+}
 .singleExistRoom, .singleChatUser{
 	height: 5vh;
 	width: 100%;
@@ -220,6 +207,10 @@ body,html{
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	cursor: pointer;
+}
+.createNewroom:hover , .singleExistRoom:hover , .singleChatUser:hover {
+	background-color: #e6e6e6;
 }
 .singleExistRoom > img , .singleChatUser > img{
 	height: 4vh;
@@ -231,7 +222,7 @@ body,html{
 	width: 5%;
     background-image: url("https://image.flaticon.com/icons/svg/25/25379.svg");
 	background-size: cover;
-    background-position: center;
+	background-position: center;
 	border: 0.1em solid;
 	border-bottom: 0;
 	border-top-left-radius: 1vh;
@@ -241,6 +232,38 @@ body,html{
 	top: 35vh;
 	margin: 0 1%;
 }
+.chatRoomOverFlowList{
+	width:10vw;
+	min-height: 1vh;
+	position: absolute;
+	bottom:103%;
+	right: 0;
+	border: 0.2vh solid;
+	border-radius: 1vh;
+	display: none;
+	background-color: #e6e6e6;
+}
+.overFlowRoom{
+	width: 100%;
+	height: 5vh;
+	text-align: center;
+	text-overflow: ellipsis;
+	display: inline-block;
+	vertical-align: middle;
+    cursor: pointer;
+}
+.overFlowRoom:hover{
+	background-color: #cce6ff;
+}
+.overFlowRoom > span{
+	-webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
 .chatRoomLoadMessage{
 	height: 5vh;
 	width: 100%;
@@ -249,74 +272,149 @@ body,html{
 	background-size: contain;
 	background-position: center;
 }
-
-.modalBackground {
-    height: 100%;
-    width: 100%;
-    z-index: 10;
-    background-color: rgba(102, 102, 102, 0.5);
-    position: absolute;
-    top: 0;
-    left: 0;
+.modalBackground{
+	height: 100%;
+	width:100%;
+	z-index: 10;
+	background-color: rgba(102,102,102,0.5);
+	position: absolute;
+	top:0;
+	left: 0;
 }
-
-.videoCamModal {
-    height: 30vh;
-    width: 30vw;
-    position: absolute;
-    top: 30vh;
-    left: 35vw;
+.videoCamModal{
+	height: 30vh;
+	width:30vw;
+	position: absolute;
+	top: 30vh;
+	left: 35vw;
     border-color: black;
-    background-color: gray;
+	background-color: gray;
     box-shadow: 5px 5px 3px grey;
-    z-index: 15;
-    opacity: 1;
+	z-index: 15;
+	opacity: 1;
 }
-
-.videoCamModal > img {
+.videoCamModal > img{
     width: 40%;
     position: absolute;
-    top: 0;
-    left: 30%;
+	top: 0;
+	left: 30%;
     padding: 3%;
     opacity: 1;
 }
-
-.modalIconSpace {
-    width: 100%;
-    height: 30%;
-    position: absolute;
-    bottom: 0;
+.modalIconSpace{
+	width:100%;
+	height:30%;
+	position: absolute;
+	bottom:0;
 }
-
-.modalCallIcon {
-    color: #00ff00;
-    font-size: 8vh;
+.modalCallIcon{
+	color : #00ff00;
+	font-size:8vh;
     margin: 0 3vw;
-    cursor: default;
+	cursor: default;
 }
-
-.modalCallIcon:hover {
-    color: green;
+.modalCallIcon:hover{
+	color: green;
 }
-
-.modalEndIcon {
-    color: red;
-    font-size: 8vh;
-    float: right;
-    margin: 0 3vw;
-    cursor: default;
+.modalEndIcon{
+	color: red;
+	font-size: 8vh ;
+	float: right;
+	margin: 0 3vw;
+	cursor: default;
 }
-
-.modalEndIcon:hover {
-    color: #990000;
+.modalEndIcon:hover{
+	color: #990000;
 }
-
-.videoClose {
-    color: white;
+.videoClose{
+	color:white;
+	position: absolute;
+	top:10%;
+	left: 88%;
+	cursor: default;
+}
+.createNewRoomModal{
+	height: 50vh;
+	width: 40vw;
+	position: absolute;
+	top:20vh;
+	left:30vw;
+	background-color: white;
+	border-radius: 1vh;
+	box-shadow: 3px 3px 3px grey;
+	outline: none;
+}
+.createNewRoomModal > h1{
+    font-size: 5vh;
+    margin: .5vh;
+}
+.createNewRoomClose{
+	cursor: default;
     position: absolute;
-    top: 10%;
-    left: 88%;
+	top:2%;
+	right:2%;
+}
+.createNewRoomName{
+    border-top: 1pt solid;
+	border-bottom: 1pt solid;
+	border-color: #cccccc;
+	height: 7vh;
+	width: 100%;
+}
+.createNewRoomName > img{
+	height: 4vh;
+}
+#roomNameSpace{
+	outline: none;
+    resize: none;
+	width: auto;
+	border: none;
+	font-size: 2.5vh;
+}
+.createNewRoomPeople{
+	height: 30vh;
+	width: 100%;
+	border-top: 1pt solid;
+	border-bottom: 1pt solid;
+	border-color: #cccccc;
+	position: absolute;
+	bottom: 5vh;
+}
+.allUserForchoose{
+	position: absolute;
+	height: 100%;
+	width: 60%;
+	overflow: auto;
+	border-right: 1pt solid;
+	border-color: #cccccc;
+}
+.userChosen{
+	height: 100%;
+	width:40%;
+	position: absolute;
+	left:60%;
+	overflow: auto;
+}
+.singleUserChosen{
+	height: 4vh;
     cursor: default;
+}
+.singleUserChosen:hover{
+	background-color: #e6e6e6;
+}
+.singleUserChosenClose{
+	height: 100%;
+	margin: auto;
+	float: right;
+	cursor: pointer;
+	display: none;
+}
+.newRoomModalSend{
+    position: absolute;
+	bottom: 0;
+	right: 0;
+    margin: .5vh;
+	background-color: #99ccff;
+    cursor:pointer;
 }
 
