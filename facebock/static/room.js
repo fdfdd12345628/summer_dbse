@@ -330,6 +330,7 @@ $(function () {
                     //getRoomMessage(content["id"])
                     //$("#display_room_"+ content["id"] +" > .singleChatRoomMessageSpace").bindScrollHandler()
                 }
+                $(".existRoomList").append('<div class="singleExistRoom" id="room_'+content['id']+'}"><img src="https://image.flaticon.com/icons/svg/784/784662.svg" alt="none"> '+content['display_name']+'</div>')
                 $(".modalBackground").remove()
             },
         })
