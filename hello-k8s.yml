@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-k8s
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8443
+      targetPort: 80
+  selector:
+    app: hello-k8s
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: hello-k8s
+  template:
+    metadata:
+      labels:
+        app: hello-k8s
+    spec:
+      containers:
+        - name: hello-deploy
+          image: httpd:latest
+          ports:
+            - containerPort: 80
+        - name: hello-mysql
+          image: mysql:latest
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: password
+          ports:
+            - containerPort: 6539
